@@ -11,7 +11,10 @@ try:
 except ImportError:
     from engine.intent.models import Intent, ActionType
 
-from orchestration.task_tracker import TaskTracker, TrackedTask
+try:
+    from orchestration.task_tracker import TaskTracker, TrackedTask
+except ImportError:
+    from engine.orchestration.task_tracker import TaskTracker, TrackedTask
 
 
 # Agent specialization map — maps action types to preferred agents
@@ -25,8 +28,13 @@ AGENT_SPECIALIZATIONS: dict[str, list[str]] = {
     "send_email": ["agent4"],
     "create_issue": ["agent3", "agent4"],
     "schedule_meeting": ["agent4"],
-    "general_task": ["agent2", "agent3"],
+    "decision": ["agent3"],
+    "follow_up": ["agent4"],
+    "general_task": ["agent1", "agent2", "agent3", "agent4"],
 }
+
+# Julian's phone for v1 dispatch notifications
+DISPATCH_PHONE = "+16195090699"
 
 GOD_BIN = "/usr/local/bin/god"
 
