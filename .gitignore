@@ -1,7 +1,30 @@
-.vercel
+# Dependencies
 node_modules/
+.venv/
+
+# Build output
 dist/
+__pycache__/
+*.py[cod]
+
+# Environment
 .env
 .env.local
 .env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Cache
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Vercel
+.vercel
