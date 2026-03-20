@@ -29,7 +29,7 @@ class Intent(BaseModel):
     urgency: Literal["now", "soon", "later"] = "soon"
     project: str | None = None
     assignee: str | None = None
-    details: str
+    details: str = ""
     confidence: float
     source_text: str
     speaker: str

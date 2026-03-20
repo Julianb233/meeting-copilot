@@ -17,7 +17,7 @@ You are a meeting transcript classifier. Classify each sentence into EXACTLY one
 - INFO: General conversation, filler, context, opinions
 
 Return a JSON array of objects with "index" and "classification" keys.
-Example: [{"index": 0, "classification": "ACTION_ITEM"}, {"index": 1, "classification": "INFO"}]
+Example: [{{"index": 0, "classification": "ACTION_ITEM"}}, {{"index": 1, "classification": "INFO"}}]
 
 Return ONLY valid JSON, no markdown formatting.
 
