@@ -82,6 +82,9 @@ Recent decisions affecting current work:
 - D-0501-2: meeting_type stored as str (not enum) on UnifiedMeetingContext for JSON serialization
 - D-0503-1: Tone-based email templating — client gets professional tone, internal gets casual
 - D-0503-2: gws CLI subprocess for email sending (consistent with contacts pattern)
+- D-0502-1: Lazy import of extract_prior_context in assembler to break circular dependency
+- D-0502-2: prior_context stored as dict (not Pydantic model) on UnifiedMeetingContext for JSON serialization
+- D-0502-3: Only populate prior_context when total_prior_meetings > 0 (None otherwise)
 
 ### Pending Todos
 
@@ -96,5 +99,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-20 21:50 UTC
-Stopped at: Completed 05-03-PLAN.md — Follow-up Email + Summary Generator
+Stopped at: Completed 05-02-PLAN.md — Prior Meeting Context (executed after 05-03)
 Resume file: None
