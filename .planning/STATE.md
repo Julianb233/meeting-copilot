@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 2 of 6 (Context Engine)
-Plan: 3 complete, others in progress
+Plan: 02-01 summary created (4 of phase 2 done)
 Status: In progress
-Last activity: 2026-03-20 — Completed 02-04 (Client profile loader)
+Last activity: 2026-03-20 — Completed 02-01 (attendee identity resolution)
 
-Progress: ████████░░ ~35%
+Progress: ████████░░ ~40%
 
 ## Performance Metrics
 
@@ -53,6 +53,9 @@ Recent decisions affecting current work:
 - D-0204-2: Search client-profiles/ before Obsidian contacts (richer data first)
 - D-0204-3: Trim raw_content to 2000 chars for LLM context injection
 - D-0203-1: Use direct `import config` pattern matching existing codebase convention
+- D-0201-1: Shell out to gws CLI for Google Contacts (avoids OAuth credential management)
+- D-0201-2: Skip default silhouette photos (no useful identity signal)
+- D-0201-3: Case-insensitive email matching to confirm fuzzy search results
 
 ### Pending Todos
 
@@ -66,6 +69,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:24 UTC
-Stopped at: Completed 02-03-PLAN.md — Linear project mapper
+Last session: 2026-03-20 21:25 UTC
+Stopped at: Completed 02-01-PLAN.md — Attendee identity resolution
 Resume file: None
