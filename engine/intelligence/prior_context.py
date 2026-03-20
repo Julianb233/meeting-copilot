@@ -12,9 +12,8 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from context.fireflies import TranscriptSummary
-
 if TYPE_CHECKING:
+    from context.fireflies import TranscriptSummary
     from context.models import AttendeeContext
 
 logger = logging.getLogger(__name__)
@@ -147,6 +146,8 @@ def extract_prior_context(
 
 if __name__ == "__main__":
     from context.contacts import AttendeeIdentity
+    from context.fireflies import TranscriptSummary
+    from context.models import AttendeeContext
 
     # Mock data for testing
     ts1 = TranscriptSummary(

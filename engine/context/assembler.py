@@ -31,7 +31,6 @@ from context.fireflies import fetch_meeting_history
 from context.linear_client import fetch_linear_projects
 from context.profiles import load_client_profile
 from intelligence.meeting_classifier import classify_meeting_type, get_client_domains
-from intelligence.prior_context import extract_prior_context
 
 logger = logging.getLogger(__name__)
 
@@ -157,6 +156,8 @@ async def assemble_meeting_context(
     client_domains = get_client_domains(emails)
 
     # Extract prior meeting context from attendee histories
+    from intelligence.prior_context import extract_prior_context
+
     prior = extract_prior_context(attendee_contexts)
 
     return UnifiedMeetingContext(
