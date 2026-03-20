@@ -195,6 +195,19 @@ class FleetSpawner:
         return tasks
 
 
+# Convenience function for direct use
+async def spawn_agent_task(
+    intent: Intent,
+    tracker: Optional[TaskTracker] = None,
+    meeting_title: Optional[str] = None,
+) -> TrackedTask:
+    """Spawn a single agent task. Creates tracker if not provided."""
+    if tracker is None:
+        tracker = TaskTracker()
+    spawner = FleetSpawner(tracker)
+    return await spawner.spawn(intent, meeting_title)
+
+
 if __name__ == "__main__":
     # Quick test: agent selection without actually spawning
     tracker = TaskTracker()
