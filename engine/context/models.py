@@ -45,6 +45,7 @@ class UnifiedMeetingContext(BaseModel):
     assembled_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     load_time_seconds: float = 0.0
     attendees: list[AttendeeContext] = Field(default_factory=list)
+    prior_context: dict | None = None
     errors: list[str] = Field(default_factory=list)
 
     def to_classifier_prompt(self) -> str:
@@ -113,6 +114,13 @@ class UnifiedMeetingContext(BaseModel):
                         f"{commit.message[:80]}"
                     )
 
+            lines.append("")
+
+        if self.prior_context:
+            from intelligence.prior_context import PriorMeetingContext
+
+            prior = PriorMeetingContext(**self.prior_context)
+            lines.append(prior.to_prompt_text())
             lines.append("")
 
         if self.errors:
