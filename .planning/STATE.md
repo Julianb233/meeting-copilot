@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** The meeting IS the work — copilot detects needs and executes work during the meeting, not after.
-**Current focus:** Phase 5 (Meeting Intelligence)
+**Current focus:** Phase 6 (Integration & Polish)
 
 ## Current Position
 
-Phase: 5 of 6 (Meeting Intelligence)
-Plan: 05-03 complete (05-01, 05-02, 05-03 done)
+Phase: 6 of 6 (Integration & Polish)
+Plan: 06-01 complete
 Status: In progress
-Last activity: 2026-03-20 — Completed 05-03 (Follow-up Email + Summary Generator)
+Last activity: 2026-03-20 — Completed 06-01 (Bridge Meeting-Watcher v2)
 
-Progress: ██████████████████░ ~91%
+Progress: ██████████████████░ ~93%
 
 ## Performance Metrics
 
@@ -85,6 +85,8 @@ Recent decisions affecting current work:
 - D-0502-1: Lazy import of extract_prior_context in assembler to break circular dependency
 - D-0502-2: prior_context stored as dict (not Pydantic model) on UnifiedMeetingContext for JSON serialization
 - D-0502-3: Only populate prior_context when total_prior_meetings > 0 (None otherwise)
+- D-0601-1: Late-import manager in WatcherBridge to avoid circular imports
+- D-0601-2: set_meeting_context() on ConnectionManager for clean public state updates
 
 ### Pending Todos
 
@@ -98,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:50 UTC
-Stopped at: Completed 05-02-PLAN.md — Prior Meeting Context (executed after 05-03)
+Last session: 2026-03-20 21:51 UTC
+Stopped at: Completed 06-01-PLAN.md — Bridge Meeting-Watcher v2
 Resume file: None
