@@ -1,8 +1,9 @@
-"""REST API endpoints for health check, state snapshots, and context assembly."""
+"""REST API endpoints for health check, state snapshots, context assembly, tasks, and intents."""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Any
 
 from fastapi import APIRouter
 from pydantic import BaseModel as PydanticBaseModel
@@ -45,3 +46,54 @@ async def load_context(body: ContextRequest) -> dict:
         display_names=body.display_names,
     )
     return ctx.model_dump(mode="json")
+
+
+# --- Task & Intent endpoints ---
+
+
+@router.get("/tasks")
+async def get_tasks() -> list[dict[str, Any]]:
+    """Return all tracked tasks from the current session."""
+    return [t.model_dump(mode="json") for t in manager.tracker.get_all_tasks()]
+
+
+@router.get("/intents")
+async def get_intents() -> list[dict[str, Any]]:
+    """Return all detected intents from the current session."""
+    return manager.state.intents
+
+
+class ProcessRequest(PydanticBaseModel):
+    """Request body for POST /api/process."""
+
+    sentences: list[dict[str, Any]]
+    meeting_title: str | None = None
+
+
+@router.post("/process")
+async def process_transcript(body: ProcessRequest) -> dict[str, Any]:
+    """Run transcript sentences through the full intent pipeline.
+
+    Testing endpoint -- processes sentences without requiring WebSocket.
+    Returns the IntentBatch result.
+    """
+    batch = await manager.detector.process_sentences(
+        body.sentences,
+        known_projects=[],
+        attendee_names=manager.state.context.attendees,
+    )
+
+    # Also run through routing/orchestration like the WebSocket path
+    if batch.intents:
+        await manager._process_intents(batch.intents, body.meeting_title)
+        manager.state.intent_count += len(batch.intents)
+        manager.state.intents.extend(
+            [i.model_dump() for i in batch.intents]
+        )
+
+    return {
+        "intents": [i.model_dump() for i in batch.intents],
+        "classifications": [c.model_dump() for c in batch.classifications],
+        "model_used": batch.model_used,
+        "processing_time_ms": batch.processing_time_ms,
+    }
