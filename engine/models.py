@@ -49,6 +49,7 @@ class MeetingContext(BaseModel):
     title: str | None = None
     attendees: list[str] = Field(default_factory=list)
     started_at: datetime | None = None
+    rich_context: dict[str, Any] | None = None  # Populated by context assembler
 
 
 class MeetingState(BaseModel):
