@@ -10,25 +10,25 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 2 of 6 (Context Engine)
-Plan: 4 in progress
+Plan: 3 complete, others in progress
 Status: In progress
-Last activity: 2026-03-20 — Completed 02-04 (client profile loader)
+Last activity: 2026-03-20 — Completed 02-04 (Client profile loader)
 
-Progress: ███████░░░ ~30%
+Progress: ████████░░ ~35%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: ~2.9 min
-- Total execution time: ~14.4 min
+- Total plans completed: 6
+- Average duration: ~2.8 min
+- Total execution time: ~16.9 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
-| 2 | 1/? | ~2 min | ~2 min |
+| 2 | 2/? | ~4.5 min | ~2.2 min |
 
 **Recent Trend:**
 - Last 5 plans: 01-02 (engine scaffold), 01-03 (integration + deploy), 01-04 (root config + deploy), 02-04 (client profile loader)
@@ -52,6 +52,7 @@ Recent decisions affecting current work:
 - D-0204-1: Use pyyaml for YAML frontmatter parsing (reliable, worth the dependency)
 - D-0204-2: Search client-profiles/ before Obsidian contacts (richer data first)
 - D-0204-3: Trim raw_content to 2000 chars for LLM context injection
+- D-0203-1: Use direct `import config` pattern matching existing codebase convention
 
 ### Pending Todos
 
@@ -65,6 +66,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:22 UTC
-Stopped at: Completed 02-04-PLAN.md — Client profile loader
+Last session: 2026-03-20 21:24 UTC
+Stopped at: Completed 02-03-PLAN.md — Linear project mapper
 Resume file: None
