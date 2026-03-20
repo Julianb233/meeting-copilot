@@ -16,6 +16,16 @@ from context.linear_client import LinearIssue, LinearProject
 from context.profiles import ClientProfile
 
 
+class GitCommit(BaseModel):
+    """A single git commit from a project repo."""
+
+    sha: str
+    author: str
+    date: datetime
+    message: str
+    repo_name: str
+
+
 class AttendeeContext(BaseModel):
     """Complete context for a single meeting attendee."""
 
@@ -23,6 +33,7 @@ class AttendeeContext(BaseModel):
     meeting_history: list[TranscriptSummary] = Field(default_factory=list)
     linear_projects: list[LinearProject] = Field(default_factory=list)
     client_profile: ClientProfile | None = None
+    git_activity: list[GitCommit] = Field(default_factory=list)
 
 
 class UnifiedMeetingContext(BaseModel):
@@ -85,6 +96,18 @@ class UnifiedMeetingContext(BaseModel):
                     lines.append(f"    Formality: {prof.formality}")
                 if prof.relationship:
                     lines.append(f"    Relationship: {prof.relationship}")
+
+            if att.git_activity:
+                lines.append(
+                    f"  Recent git activity "
+                    f"({len(att.git_activity)} commits, last 7 days):"
+                )
+                for commit in att.git_activity[:5]:
+                    date_str = commit.date.strftime("%Y-%m-%d")
+                    lines.append(
+                        f"    - {date_str} ({commit.repo_name}): "
+                        f"{commit.message[:80]}"
+                    )
 
             lines.append("")
 
