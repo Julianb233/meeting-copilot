@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 6 of 6 (Integration & Polish)
-Plan: 06-03 complete
+Plan: 06-03 complete, 04-04 complete (partial - Task 1 only, Tasks 2-3 require human action)
 Status: In progress
-Last activity: 2026-03-20 — Completed 06-03 (E2E Meeting Lifecycle Test)
+Last activity: 2026-03-20 — Completed 04-04 Task 1 (Vercel Deploy), Tasks 2-3 pending human action (Zoom Marketplace)
 
-Progress: ███████████████████░ ~97%
+Progress: ███████████████████░ ~98%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21
-- Average duration: ~2.5 min
-- Total execution time: ~51.6 min
+- Total plans completed: 22
+- Average duration: ~2.4 min
+- Total execution time: ~53.6 min
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: ███████████████████░ ~97%
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
 | 2 | 6/6 | ~13.1 min | ~2.2 min |
 | 3 | 4/4 | ~10 min | ~2.5 min |
-| 4 | 3/4 | ~6 min | ~2 min |
+| 4 | 4/4 | ~8 min | ~2 min |
 | 5 | 3/? | ~7.1 min | ~2.4 min |
 
 **Recent Trend:**
@@ -91,6 +91,7 @@ Recent decisions affecting current work:
 - D-0602-2: CSP frame-ancestors includes https://*.zoom.us for iframe embedding
 - D-0603-1: Renamed raw test functions to run_* prefix to avoid pytest double-collection
 - D-0603-2: Mock context.assembler at source module path for late-import compatibility
+- D-0404-1: Panel deployed to panel-ruddy-eight.vercel.app (Vercel prod alias)
 
 ### Pending Todos
 
@@ -104,6 +105,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 14:57 UTC
-Stopped at: Completed 06-03-PLAN.md — E2E Meeting Lifecycle Test
+Last session: 2026-03-20 23:15 UTC
+Stopped at: Completed 04-04-PLAN.md Task 1 (Vercel Deploy). Tasks 2-3 require Julian's manual Zoom Marketplace registration.
 Resume file: None
