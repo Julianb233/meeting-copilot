@@ -1,0 +1,28 @@
+[
+  {
+    "id": "worker-Ubun-0246",
+    "registeredAt": "2026-03-20T20:57:26Z",
+    "lastHeartbeat": "2026-03-20T20:57:26Z",
+    "status": "idle",
+    "currentTask": null,
+    "checkpoint": null,
+    "sessionId": "3603573",
+    "stats": {
+      "tasksCompleted": 0,
+      "tasksFailed": 0,
+      "totalExecutionTime": 0,
+      "avgTaskTime": 0
+    },
+    "capabilities": {
+      "preferredTypes": ["plan", "build"],
+      "avoidTypes": [],
+      "maxComplexity": 10
+    },
+    "health": {
+      "consecutiveFailures": 0,
+      "lastError": null,
+      "circuitBreakerOpen": false
+    },
+    "shutdownRequested": false
+  }
+]

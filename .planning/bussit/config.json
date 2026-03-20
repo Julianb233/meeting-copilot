@@ -1,0 +1,22 @@
+{
+  "projectName": "meeting-copilot",
+  "projectPath": "/opt/agency-workspace/meeting-copilot",
+  "maxRetries": 3,
+  "linearIntegration": {
+    "enabled": true,
+    "teamKey": "AI",
+    "teamId": "9a9d11aa-c8a5-4dc5-855c-c1da260db615",
+    "autoCreateIssues": false,
+    "stateIds": {
+      "Backlog": "1414377a-e0d6-4c23-bdfc-3d51049c1b19",
+      "Todo": "455d246f-ccf7-46d5-b7a4-c02985ee1390",
+      "In Progress": "58f2d9c4-1937-4bfa-be94-09e91831a8f5",
+      "In Review": "9ff7fe5c-d98b-4ac4-ab19-82e20b7baf4b",
+      "Done": "99712028-3475-4157-9052-8ba749ded0da",
+      "Canceled": "9cd681fe-34f9-40b8-92ba-9c2c06c77968"
+    }
+  },
+  "beadsIntegration": {
+    "enabled": false
+  }
+}
