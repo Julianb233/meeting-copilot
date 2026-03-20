@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 1 of 6 (Project Scaffold & Infrastructure)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-20 — Roadmap created, bussit worker initializing
+Plan: 2 of 4 complete
+Status: In progress
+Last activity: 2026-03-20 — Completed 01-02-PLAN.md (Python copilot engine)
 
-Progress: ░░░░░░░░░░ 0%
+Progress: ██░░░░░░░░ ~15%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 2
+- Average duration: ~3.5 min
+- Total execution time: ~7 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| — | — | — | — |
+| 1 | 2/4 | ~7 min | ~3.5 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (panel scaffold), 01-02 (engine scaffold)
+- Trend: Fast execution, clean results
 
 ## Accumulated Context
 
@@ -40,7 +40,10 @@ Progress: ░░░░░░░░░░ 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-(None yet)
+- D-0101-1: Tailwind CSS v4 with @tailwindcss/vite plugin (no PostCSS config needed)
+- D-0101-2: Biome for formatting + linting alongside ESLint
+- D-0102-1: Python 3.10 target (system constraint, all deps compatible)
+- D-0102-2: Use lifespan context manager over deprecated on_event
 
 ### Pending Todos
 
@@ -53,6 +56,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20
-Stopped at: Project initialization — bussit worker starting
+Last session: 2026-03-20 21:07 UTC
+Stopped at: Completed 01-02-PLAN.md
 Resume file: None
