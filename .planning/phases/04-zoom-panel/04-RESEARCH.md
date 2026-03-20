@@ -1,393 +1,462 @@
 # Phase 4: Zoom Companion Panel UI - Research
 
 **Researched:** 2026-03-20
-**Domain:** Zoom Apps SDK, OAuth, iframe-embedded React app, WebSocket in Zoom
-**Confidence:** MEDIUM-HIGH (SDK types verified from installed package, Zoom docs verified via official sources)
+**Domain:** Zoom Apps SDK, React sidebar UI, Zoom OAuth, iframe constraints
+**Confidence:** MEDIUM (Zoom docs are authoritative but scattered; some details verified only via forum posts)
 
 ## Summary
 
-Phase 4 involves registering a private Zoom App that renders as a Meeting Side Panel (iframe), implementing OAuth for authentication, and building a React UI inside the Zoom sidebar that connects to the engine via WebSocket for real-time updates.
+Phase 4 builds a React sidebar app that runs inside the Zoom client as a Meeting Side Panel. The existing codebase (panel/) already has Vite + React 19 + Tailwind v4 + Zoom Apps SDK v0.16.37 + Zustand + react-use-websocket scaffolded, with a working App.tsx that initializes the Zoom SDK and renders task/agent status sections. The WebSocket hook and message types are already wired.
 
-The Zoom Apps SDK (`@zoom/appssdk` v0.16.37, already installed) provides the bridge between the iframe and the Zoom client. The app loads as a web page inside Zoom's embedded browser (Chromium-based), configured via a "Home URL" pointing to the Vercel-hosted panel. WebSocket connections ARE supported inside Zoom Apps but require explicit domain whitelisting and CSP `connect-src` configuration.
+The primary work remaining is: (1) registering the app on Zoom Marketplace as a General App with Zoom Apps SDK feature enabled, (2) handling authentication (SDK-only approach preferred -- see Open Questions), (3) building out the UI components for the constrained sidebar width, (4) adding quick action buttons that send commands via the existing WebSocket, and (5) deploying to Vercel with required OWASP security headers.
 
-The panel is already scaffolded with SDK init, WebSocket hook, Zustand store, and basic UI. Phase 4 completes the Zoom Marketplace registration, implements in-client OAuth with PKCE, builds the full panel UI components, and wires up quick action buttons.
+**Critical correction from prior research:** In-client OAuth (`zoomSdk.authorize()`) is NOT available for unpublished/development apps. The official docs state: "The in-client app flow to add an app is not available for unpublished apps." For a private single-user app, use the traditional OAuth redirect flow via the Marketplace "Local Test" page, OR skip OAuth entirely and rely on SDK-only capabilities (which work without tokens for basic meeting context).
 
-**Primary recommendation:** Register a private "General (OAuth)" app on Zoom Marketplace with `zoomapp:inmeeting` scope. Use in-client OAuth (`zoomSdk.authorize` + `onAuthorized` + PKCE) rather than redirect-based OAuth. Add the VPS WebSocket domain to both CSP `connect-src` and the Marketplace Domain Allow List.
+**Primary recommendation:** Create a General App (user-managed) on Zoom Marketplace with Zoom Apps SDK enabled. Start with SDK-only capabilities (no OAuth token exchange needed) since the panel's data comes from the engine via WebSocket, not from Zoom REST APIs. Deploy to Vercel with the 4 required OWASP headers in vercel.json. The app stays in development/private mode. Build all UI for a minimum ~280px width with fluid scaling.
 
 ## Standard Stack
 
-### Core
+### Core (Already Installed)
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| @zoom/appssdk | 0.16.37 | Zoom client <-> iframe bridge | Official Zoom SDK, already installed |
-| react | 19.2.4 | UI framework | Already scaffolded |
-| zustand | 5.0.12 | State management | Already scaffolded, lightweight |
-| react-use-websocket | 4.13.0 | WebSocket client | Already scaffolded in useEngine hook |
-| tailwindcss | 4.2.2 | Styling | Already scaffolded |
-| lucide-react | 0.577.0 | Icons | Already installed |
+| @zoom/appssdk | ^0.16.37 | Zoom client <-> iframe bridge | Official Zoom SDK, already installed |
+| react | ^19.2.4 | UI framework | Already scaffolded |
+| react-dom | ^19.2.4 | DOM rendering | Already scaffolded |
+| tailwindcss | ^4.2.2 | Styling | Already scaffolded, ideal for constrained UIs |
+| zustand | ^5.0.12 | State management | Already scaffolded, lightweight |
+| react-use-websocket | ^4.13.0 | WebSocket client | Already scaffolded with auto-reconnect |
+| lucide-react | ^0.577.0 | Icons | Already installed, tree-shakeable |
+| vite | ^8.0.1 | Build tool | Already scaffolded |
 
-### Supporting
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| (none needed) | - | - | Stack is complete for this phase |
+### Supporting (No New Dependencies Needed)
+The existing stack covers all requirements. No additional libraries are needed.
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
-| react-use-websocket | native WebSocket | react-use-websocket handles reconnection, already integrated |
-| zustand | jotai/redux | zustand already wired up, changing would break existing code |
+| Zustand | React Context | Zustand already installed, better for WebSocket-driven updates |
+| Tailwind | CSS Modules | Tailwind already configured, better for rapid constrained-width UI |
+| lucide-react | heroicons | lucide already installed, same quality |
 
-**Installation:** No new packages needed. Stack is already installed.
+**Installation:**
+```bash
+# No new packages needed - stack is complete from Phase 1
+cd panel && npm install  # verify existing deps
+```
 
 ## Architecture Patterns
 
-### Zoom App Registration Flow (Marketplace)
-
-The app is registered on marketplace.zoom.us as a **General (OAuth) App** with distribution OFF (private):
-
-1. Go to marketplace.zoom.us > Develop > Build App > General App
-2. Toggle distribution OFF (keeps app private, never published)
-3. Set management type to "User-managed" (single user: Julian)
-4. Configure OAuth:
-   - Redirect URL: `https://<vercel-domain>/api/zoomapp/auth`
-   - OAuth Allow List: same domain
-5. Configure Features:
-   - Home URL: `https://<vercel-domain>`
-   - Domain Allow List: `<vercel-domain>`, `<vps-domain>` (for WebSocket), `appssdk.zoom.us`
-6. Add Scopes: `zoomapp:inmeeting`
-7. Use "Local Test" to install for Julian's account
-
-### In-Client OAuth Flow (PKCE)
-
-The Zoom Apps SDK supports **in-client OAuth** which avoids browser redirects. This is the correct pattern for a Zoom App:
-
-```
-1. App loads in Zoom iframe
-2. zoomSdk.config() returns auth.status
-3. If auth.status === 'unauthorized':
-   a. Generate PKCE code_verifier + code_challenge
-   b. Call zoomSdk.authorize({ codeChallenge, state })
-   c. Listen for zoomSdk.onAuthorized(event)
-   d. Event contains { code, redirectUri, result, state }
-   e. Send `code` + `code_verifier` to backend
-   f. Backend exchanges code for access_token via Zoom OAuth token endpoint
-   g. Store token server-side (single user, can use file/env)
-4. If auth.status === 'authorized': proceed normally
-```
-
-### Recommended Project Structure (Panel)
+### Recommended Project Structure
 ```
 panel/src/
-  App.tsx                  # Main app with Zoom SDK init (exists)
-  main.tsx                 # Entry point (exists)
-  index.css                # Tailwind imports (exists)
-  hooks/
-    useEngine.ts           # WebSocket connection (exists)
-    useZoomAuth.ts         # NEW: in-client OAuth with PKCE
-  stores/
-    meetingStore.ts         # Zustand store (exists, needs expansion)
-  components/
-    TaskFeed.tsx            # NEW: PNL-01 live task feed with status badges
-    CompletedItems.tsx      # NEW: PNL-02 completed items section
-    DecisionsLog.tsx        # NEW: PNL-03 decisions & notes log
-    AgentStatus.tsx         # NEW: PNL-04 agent status indicators
-    QuickActions.tsx        # NEW: PNL-05/ORC-03 quick action buttons
-    StatusBadge.tsx         # NEW: reusable status badge component
-  types/
-    messages.ts             # Shared types (exists, needs expansion)
-  lib/
-    pkce.ts                 # NEW: PKCE code_verifier/challenge generation
+├── App.tsx                    # Root: Zoom init + layout router (exists, needs refactor)
+├── main.tsx                   # Entry point (exists)
+├── index.css                  # Tailwind imports (exists)
+├── components/
+│   ├── PanelLayout.tsx        # NEW: Full panel layout with header/main/footer
+│   ├── TaskFeed.tsx           # NEW: PNL-01 live task list with status badges
+│   ├── TaskItem.tsx           # NEW: Individual task with status indicator
+│   ├── CompletedItems.tsx     # NEW: PNL-02 completed tasks section
+│   ├── DecisionLog.tsx        # NEW: PNL-03 decisions & notes log
+│   ├── AgentStatusGrid.tsx    # NEW: PNL-04 agent status indicators
+│   ├── QuickActions.tsx       # NEW: PNL-05/ORC-03 action button bar
+│   ├── QuickActionButton.tsx  # NEW: Individual action button with loading state
+│   ├── ConnectionStatus.tsx   # NEW: Zoom + Engine connection indicators (extract from App.tsx)
+│   └── ui/
+│       ├── StatusBadge.tsx    # NEW: Reusable status badge
+│       └── CollapsibleSection.tsx  # NEW: Collapsible accordion section
+├── hooks/
+│   ├── useEngine.ts           # WebSocket connection (exists)
+│   └── useZoomContext.ts      # NEW: Extract Zoom SDK init from App.tsx
+├── stores/
+│   └── meetingStore.ts        # Zustand store (exists)
+├── types/
+│   └── messages.ts            # TypeScript message types (exists)
+└── vite-env.d.ts
 ```
 
-### Pattern 1: Zoom SDK Initialization with Auth Check
-**What:** Initialize SDK, check auth status, trigger OAuth if needed
-**When to use:** App startup (already partially implemented in App.tsx)
+### Pattern 1: Collapsible Sections for Narrow Sidebar
+**What:** Each panel section (Tasks, Completed, Agents, etc.) is a collapsible accordion to maximize usable space in the ~280-320px sidebar.
+**When to use:** Always in sidebar mode; sections expand/collapse independently.
 **Example:**
 ```typescript
-// Source: @zoom/appssdk v0.16.37 sdk.d.ts type definitions
-import zoomSdk from '@zoom/appssdk'
-
-async function initZoom() {
-  const configResponse = await zoomSdk.config({
-    capabilities: [
-      'getMeetingContext',
-      'getUserContext',
-      'onMeeting',
-      'onMyUserContextChange',
-      'onAuthorized',
-      'authorize',
-      'openUrl',
-    ],
-  })
-
-  if (configResponse.auth.status === 'unauthorized') {
-    // Trigger in-client OAuth
-    const { codeVerifier, codeChallenge } = await generatePKCE()
-    // Store codeVerifier for later exchange
-    sessionStorage.setItem('pkce_verifier', codeVerifier)
-
-    zoomSdk.onAuthorized(async (event) => {
-      if (event.result) {
-        // Send event.code + codeVerifier to backend for token exchange
-        await fetch('/api/zoomapp/token', {
-          method: 'POST',
-          body: JSON.stringify({ code: event.code, codeVerifier }),
-        })
-      }
-    })
-
-    await zoomSdk.authorize({ codeChallenge, state: crypto.randomUUID() })
-  }
-
-  // Auth is good, get meeting context
-  if (configResponse.runningContext === 'inMeeting') {
-    const ctx = await zoomSdk.getMeetingContext()
-    // ctx: { meetingTopic: string, meetingID: string }
-  }
+function CollapsibleSection({ title, count, children, defaultOpen = true }: Props) {
+  const [open, setOpen] = useState(defaultOpen)
+  return (
+    <div className="border-b border-zinc-800">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-3 py-2 text-sm font-medium text-zinc-300 hover:bg-zinc-800/50"
+      >
+        <span>{title}</span>
+        <span className="flex items-center gap-2">
+          {count !== undefined && count > 0 && (
+            <span className="bg-zinc-700 text-zinc-300 text-xs px-1.5 py-0.5 rounded-full">{count}</span>
+          )}
+          <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </span>
+      </button>
+      {open && <div className="px-3 pb-3">{children}</div>}
+    </div>
+  )
 }
 ```
 
-### Pattern 2: PKCE Code Challenge Generation
-**What:** Generate cryptographically secure PKCE pair for OAuth
-**When to use:** Before calling `zoomSdk.authorize()`
+### Pattern 2: Status Badge System
+**What:** Consistent color-coded status indicators across tasks and agents.
+**When to use:** Every task and agent status display.
 **Example:**
 ```typescript
-// Source: OAuth 2.0 PKCE standard (RFC 7636)
-export async function generatePKCE() {
-  const array = new Uint8Array(32)
-  crypto.getRandomValues(array)
-  const codeVerifier = btoa(String.fromCharCode(...array))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '')
+const STATUS_CONFIG: Record<TaskStatus, { color: string; label: string }> = {
+  pending:   { color: 'bg-zinc-500',              label: 'Pending' },
+  running:   { color: 'bg-blue-500 animate-pulse', label: 'Running' },
+  completed: { color: 'bg-green-500',             label: 'Done' },
+  failed:    { color: 'bg-red-500',               label: 'Failed' },
+}
 
-  const encoder = new TextEncoder()
-  const data = encoder.encode(codeVerifier)
-  const digest = await crypto.subtle.digest('SHA-256', data)
-  const codeChallenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=/g, '')
-
-  return { codeVerifier, codeChallenge }
+function StatusBadge({ status }: { status: TaskStatus }) {
+  const config = STATUS_CONFIG[status]
+  return (
+    <span className="flex items-center gap-1.5">
+      <span className={`w-2 h-2 rounded-full ${config.color}`} />
+      <span className="text-xs text-zinc-400">{config.label}</span>
+    </span>
+  )
 }
 ```
 
-### Pattern 3: Quick Action Button Dispatch
-**What:** Send quick action via WebSocket to engine, which spawns fleet agents
-**When to use:** PNL-05/ORC-03 quick action buttons
+### Pattern 3: Quick Action Dispatch via Existing WebSocket
+**What:** Quick action buttons send typed messages through the already-wired sendAction from useEngine.
+**When to use:** All quick action buttons (PNL-05/ORC-03).
 **Example:**
 ```typescript
-// Source: existing types/messages.ts PanelMessage type
-const { sendAction } = useEngine()
+function QuickActions() {
+  const { sendAction, connected } = useEngine()
+  const actions: { type: QuickActionType; label: string; icon: LucideIcon }[] = [
+    { type: 'delegate',      label: 'Delegate Task',    icon: Users },
+    { type: 'create_issue',  label: 'Create Proposal',  icon: FileText },
+    { type: 'research',      label: 'Research This',     icon: Search },
+    { type: 'draft_email',   label: 'Draft Email',      icon: Mail },
+    { type: 'check_domain',  label: 'Check Domain',     icon: Globe },
+  ]
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {actions.map((a) => (
+        <button
+          key={a.type}
+          onClick={() => sendAction({ type: 'quick_action', action: a.type })}
+          disabled={!connected}
+          className="flex items-center gap-2 px-3 py-2 text-xs text-zinc-300 bg-zinc-800 hover:bg-zinc-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <a.icon className="w-3.5 h-3.5" />
+          {a.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+```
 
-function handleQuickAction(action: QuickActionType) {
-  sendAction({
-    type: 'quick_action',
-    action,
-    payload: {
-      meeting_id: meetingState.context.meeting_id,
-      // Additional context from current meeting
-    },
-  })
+### Pattern 4: Responsive Sidebar Layout
+**What:** Full-height flex layout with fixed header/footer and scrollable main area.
+**When to use:** Root panel layout.
+**Example:**
+```typescript
+function PanelLayout() {
+  const meetingState = useMeetingStore((s) => s.state)
+  const activeTasks = meetingState.tasks.filter(t => t.status !== 'completed')
+  const completedTasks = meetingState.tasks.filter(t => t.status === 'completed')
+
+  return (
+    <div className="h-screen flex flex-col bg-zinc-950 text-zinc-100">
+      <header className="flex-shrink-0 px-3 py-2 border-b border-zinc-800">
+        <ConnectionStatus />
+      </header>
+
+      <main className="flex-1 overflow-y-auto">
+        <CollapsibleSection title="Active Tasks" count={activeTasks.length} defaultOpen>
+          <TaskFeed tasks={activeTasks} />
+        </CollapsibleSection>
+        <CollapsibleSection title="Completed" count={completedTasks.length} defaultOpen={false}>
+          <CompletedItems tasks={completedTasks} />
+        </CollapsibleSection>
+        <CollapsibleSection title="Agents" count={meetingState.agents.length} defaultOpen>
+          <AgentStatusGrid agents={meetingState.agents} />
+        </CollapsibleSection>
+      </main>
+
+      <footer className="flex-shrink-0 px-3 py-2 border-t border-zinc-800">
+        <QuickActions />
+      </footer>
+    </div>
+  )
 }
 ```
 
 ### Anti-Patterns to Avoid
-- **Redirect-based OAuth in Zoom iframe:** Zoom Apps run in an embedded browser. Do NOT redirect to external OAuth pages. Use `zoomSdk.authorize()` for in-client OAuth.
-- **Polling for updates:** Use the existing WebSocket connection, not REST polling.
-- **localStorage for tokens:** Zoom's embedded browser may clear storage between sessions. Store tokens server-side (engine).
-- **Ignoring runningContext:** Always check `configResponse.runningContext` before calling meeting-specific APIs. The app could be running in `inMainClient` (outside a meeting).
+- **Fixed pixel widths:** The sidebar width varies by OS and user resizing. Use `w-full` and relative sizing, never `w-[320px]`.
+- **Heavy scroll areas:** Avoid deeply nested scroll containers. Use one main scrollable area with collapsible sections.
+- **Storing auth tokens in localStorage:** Zoom's embedded browser clears localStorage when the app closes. Use server-side session storage if OAuth is needed.
+- **In-client OAuth for unpublished apps:** `zoomSdk.authorize()` does NOT work for development/unpublished apps. Use traditional OAuth redirect or SDK-only approach.
+- **Blocking the main thread:** All WebSocket handling and Zoom SDK calls are async. Never block on these.
+- **Calling SDK methods before config():** `zoomSdk.config()` must be the FIRST SDK call. It establishes the communication channel.
 
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| PKCE generation | Custom crypto utils | Web Crypto API (built-in) | Browser-native, secure, no dependencies |
-| WebSocket reconnection | Custom retry logic | react-use-websocket (already installed) | Handles reconnect, heartbeat, ready state |
-| State management | Context + useReducer | Zustand (already installed) | Already wired up, simpler API |
-| Status badges | Custom CSS classes | Tailwind utility classes | Already using Tailwind, consistent design |
-| OAuth token exchange | Custom fetch + parse | FastAPI endpoint on engine | Backend handles securely, stores tokens |
+| WebSocket connection | Custom WebSocket manager | react-use-websocket (already installed) | Handles reconnect, heartbeat, state |
+| Zoom SDK communication | Direct postMessage to parent | @zoom/appssdk | Required protocol, handles iframe bridging |
+| OAuth token exchange | Custom token handling in frontend | Backend proxy endpoint (if needed) | Tokens must never be in frontend code |
+| Status badge colors | Per-component color logic | Centralized STATUS_CONFIG map | Consistency across all components |
+| Scrollable containers | Custom scroll handling | CSS overflow-y-auto with Tailwind | Native scrolling works fine in Zoom's embedded browser |
+| PKCE generation | Custom base64 utils | Web Crypto API (built-in) | Browser-native, secure, no dependencies |
 
-**Key insight:** The panel scaffold already has the hard infrastructure (WebSocket, Zustand, SDK init). Phase 4 is about completing the Marketplace registration, adding OAuth, building UI components, and wiring quick actions -- not building new infrastructure.
+**Key insight:** The existing codebase already has the hard parts (WebSocket, Zustand store, Zoom SDK init, message types). Phase 4 is primarily UI component work + Zoom app registration configuration.
 
 ## Common Pitfalls
 
-### Pitfall 1: WebSocket blocked by Zoom CSP
-**What goes wrong:** WebSocket connection to VPS fails silently or with CSP error inside Zoom
-**Why it happens:** Zoom's embedded browser enforces CSP. The WebSocket domain must be in BOTH the app's Domain Allow List (Marketplace config) AND the page's CSP `connect-src` header.
-**How to avoid:**
-1. Add VPS domain (e.g., `vps.example.com`) to Marketplace Domain Allow List
-2. Serve panel with CSP header: `connect-src 'self' wss://vps.example.com:8900`
-3. Add `appssdk.zoom.us` to Domain Allow List (required for SDK)
-**Warning signs:** WebSocket connects fine in standalone browser but fails in Zoom
-
-### Pitfall 2: OAuth Redirect URL Mismatch
-**What goes wrong:** OAuth flow fails with "redirect_uri mismatch" error
-**Why it happens:** Zoom strictly validates redirect URLs. Development vs production URLs differ.
-**How to avoid:**
-1. Configure BOTH development and production redirect URLs in Marketplace
-2. Use environment-specific Vercel URLs
-3. If using ngrok for dev, update Marketplace config whenever ngrok URL changes
-**Warning signs:** OAuth works in one environment but not another
-
-### Pitfall 3: getMeetingContext Fails Outside Meeting
-**What goes wrong:** `zoomSdk.getMeetingContext()` throws when app opens from main client
-**Why it happens:** This API is only available when `runningContext === 'inMeeting'`
-**How to avoid:** Always check `configResponse.runningContext` before calling meeting-specific APIs
-**Warning signs:** "API not available in this context" errors
-
-### Pitfall 4: Zoom Embedded Browser Clears State
-**What goes wrong:** Auth state lost when user closes and reopens the panel
-**Why it happens:** Zoom's embedded Chromium may not persist localStorage/sessionStorage between panel opens
-**How to avoid:** Store auth tokens server-side (engine). On panel open, verify auth status via `zoomSdk.config()` response.
-**Warning signs:** User has to re-auth every time they open the panel
-
-### Pitfall 5: Side Panel Size Constraints
-**What goes wrong:** UI renders incorrectly or elements are cut off
-**Why it happens:** Zoom side panel has fixed width (~340-480px). Designing for wider viewports breaks layout.
-**How to avoid:** Design for 340px minimum width. Use single-column layout. Test in actual Zoom panel.
-**Warning signs:** UI looks fine in browser but broken in Zoom
-
-### Pitfall 6: config() Must Be Called First
-**What goes wrong:** SDK API calls fail with cryptic errors
-**Why it happens:** `zoomSdk.config()` must be the FIRST SDK call. It establishes the communication channel.
-**How to avoid:** Already handled in App.tsx -- just ensure no other SDK calls happen before config resolves
-**Warning signs:** "SDK not configured" or timeout errors
-
-## Code Examples
-
-### CSP Headers for Vercel (vercel.json)
+### Pitfall 1: Missing OWASP Headers Blocks App Rendering
+**What goes wrong:** The Zoom embedded browser silently refuses to render the app, showing a blank panel.
+**Why it happens:** Zoom requires 4 OWASP security headers on ALL HTML responses with 200 status. Missing any one blocks rendering entirely.
+**How to avoid:** Configure these headers in vercel.json for all routes:
 ```json
 {
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; connect-src 'self' wss://ENGINE_DOMAIN:8900 https://ENGINE_DOMAIN:8900; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-ancestors https://*.zoom.us"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://appssdk.zoom.us; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://ENGINE_DOMAIN https://api.zoom.us; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'self'"
         }
       ]
     }
   ]
 }
 ```
+**Warning signs:** Blank white panel in Zoom, console error "Missing OWASP Secure Headers".
 
-### Backend Token Exchange Endpoint (FastAPI)
-```python
-# Source: Zoom OAuth documentation
-# POST /api/zoomapp/token
-@app.post("/api/zoomapp/token")
-async def exchange_zoom_token(code: str, code_verifier: str):
-    async with httpx.AsyncClient() as client:
-        resp = await client.post(
-            "https://zoom.us/oauth/token",
-            params={
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": REDIRECT_URI,
-                "code_verifier": code_verifier,
-            },
-            auth=(CLIENT_ID, CLIENT_SECRET),
-        )
-    tokens = resp.json()
-    # Store tokens server-side (single user, file or env is fine)
-    save_tokens(tokens["access_token"], tokens["refresh_token"])
-    return {"ok": True}
+### Pitfall 2: In-Client OAuth NOT Available for Unpublished Apps
+**What goes wrong:** Calling `zoomSdk.authorize()` fails or shows no consent screen.
+**Why it happens:** Zoom restricts in-client OAuth to published/beta apps. Official docs: "The in-client app flow to add an app is not available for unpublished apps."
+**How to avoid:** For a private app used by one account:
+1. Use the Zoom Marketplace "Local Test" page to add the app to Julian's account
+2. If Zoom REST API access is needed, implement traditional OAuth via a backend redirect endpoint
+3. If only SDK capabilities are needed (getMeetingContext, etc.), skip OAuth entirely -- config() works without tokens
+**Warning signs:** `authorize()` throws an error or hangs indefinitely.
+
+### Pitfall 3: localStorage/Cookies Cleared on App Close
+**What goes wrong:** User state, tokens, or preferences disappear when the Zoom app panel is closed and reopened.
+**Why it happens:** Zoom's embedded browser clears cookies and localStorage when the app closes.
+**How to avoid:** Store all persistent data server-side. Use the Zoom user_id (from getUserContext) as the key to restore state on app reopen.
+**Warning signs:** Users have to re-authenticate every time they open the panel.
+
+### Pitfall 4: CSP Must Match Domain Allow List in Marketplace
+**What goes wrong:** Resources (scripts, WebSocket connections, fonts) are blocked in the Zoom embedded browser.
+**Why it happens:** The CSP headers in your response AND the Domain Allow List configured in Zoom Marketplace must BOTH permit the same domains. They must mirror each other.
+**How to avoid:** Mirror every domain in your CSP in the Marketplace Domain Allow List configuration. Include: your Vercel domain, the engine WebSocket domain, `appssdk.zoom.us`.
+**Warning signs:** Console errors about blocked resources, WebSocket connects in standalone browser but fails inside Zoom.
+
+### Pitfall 5: expandApp() Only Works In Meeting
+**What goes wrong:** Calling expandApp() outside a meeting context throws an error.
+**Why it happens:** The API is meeting-context-only.
+**How to avoid:** Check `getRunningContext()` result before calling meeting-specific APIs. Only offer expand/meeting features when `runningContext === 'inMeeting'`.
+**Warning signs:** Runtime error when testing in standalone mode or main client context.
+
+### Pitfall 6: config() Must Be Called First
+**What goes wrong:** SDK API calls fail with cryptic errors or timeouts.
+**Why it happens:** `zoomSdk.config()` must be the FIRST SDK call. It establishes the communication channel between iframe and Zoom client.
+**How to avoid:** Already handled in App.tsx -- ensure no other SDK calls happen before config() resolves.
+**Warning signs:** "SDK not configured" or timeout errors.
+
+## Code Examples
+
+### vercel.json with Required OWASP Headers
+```json
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "same-origin" },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://appssdk.zoom.us; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://ENGINE_DOMAIN https://api.zoom.us; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'self'"
+        }
+      ]
+    }
+  ]
+}
+```
+Note: Replace `ENGINE_DOMAIN` with actual VPS domain. The CSP domains MUST also be added to the Zoom Marketplace Domain Allow List.
+
+### Zoom SDK Initialization with Context Check
+```typescript
+// Source: existing panel/src/App.tsx + Zoom Apps SDK docs
+import zoomSdk from '@zoom/appssdk'
+
+async function initZoom() {
+  try {
+    const configResponse = await zoomSdk.config({
+      capabilities: [
+        'getMeetingContext',
+        'getUserContext',
+        'getRunningContext',
+        'expandApp',
+        'onMeeting',
+        'openUrl',
+      ],
+    })
+    console.log('Zoom SDK configured:', configResponse)
+
+    // Check running context before calling meeting-specific APIs
+    const runCtx = await zoomSdk.getRunningContext()
+    if (runCtx.context === 'inMeeting') {
+      const meetingCtx = await zoomSdk.getMeetingContext()
+      // meetingCtx has: meetingTopic, meetingID
+    }
+
+    return { status: 'connected' as const, configResponse }
+  } catch (err) {
+    console.log('Not running inside Zoom, standalone mode:', err)
+    return { status: 'standalone' as const }
+  }
+}
 ```
 
-### Zoom Marketplace Configuration Checklist
+### Quick Action Button with Loading State
+```typescript
+function QuickActionButton({ action, label, icon: Icon }: QuickActionButtonProps) {
+  const { sendAction, connected } = useEngine()
+  const [loading, setLoading] = useState(false)
+
+  const handleClick = () => {
+    if (!connected) return
+    setLoading(true)
+    sendAction({ type: 'quick_action', action })
+    setTimeout(() => setLoading(false), 5000) // fallback timeout
+  }
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={!connected || loading}
+      className="flex items-center gap-2 px-3 py-2 text-xs rounded-lg transition-colors
+        bg-zinc-800 text-zinc-300 hover:bg-zinc-700
+        disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Icon className="w-3.5 h-3.5" />}
+      {label}
+    </button>
+  )
+}
 ```
-App Type: General (OAuth)
-Distribution: OFF (private)
-Management: User-managed
 
-OAuth:
-  Redirect URL: https://<vercel-domain>/api/zoomapp/auth
-  Allow List: https://<vercel-domain>
+## Zoom App Registration Guide
 
-Features:
-  Home URL: https://<vercel-domain>
-  Domain Allow List:
-    - <vercel-domain>
-    - <vps-domain>  (for WebSocket)
-    - appssdk.zoom.us
+### Step-by-Step for Private Meeting Side Panel App
 
-Scopes:
-  - zoomapp:inmeeting
+1. **Go to** https://marketplace.zoom.us/ > Develop > Build App
+2. **Select** "General App" > Create
+3. **Basic Info:**
+   - App name: "Meeting Copilot"
+   - Management type: **User-managed** (enables Zoom Apps SDK, In-Client OAuth, Guest Mode)
+4. **OAuth Configuration:**
+   - Redirect URL: `https://your-vercel-domain.vercel.app/api/zoomapp/auth` (only needed if using OAuth)
+   - OAuth Allow List: `https://your-vercel-domain.vercel.app`
+5. **Select Features:**
+   - Product: **Meetings**
+   - Enable: **Zoom Apps SDK** feature (this makes it a side panel app)
+   - Client support: Desktop
+6. **Scopes:**
+   - `zoomapp:inmeeting` (required for in-meeting apps)
+   - `user:read` (optional, for user context)
+7. **Surface Configuration:**
+   - Home URL: `https://your-vercel-domain.vercel.app`
+   - Domain Allow List: your Vercel domain, `appssdk.zoom.us`, your engine WebSocket domain
+8. **Local Test:**
+   - Use the "Local Test" page to add the app to Julian's account
+   - No marketplace publishing required for private use
 
-Local Test:
-  - Add Julian's account for testing
-```
+### Key Registration Notes
+- The app stays in **development mode** -- no review needed for private use
+- Only the developer's account can use it (perfect for Julian's single-account use case)
+- The Home URL MUST return the 4 OWASP headers or the app will not render
+- Domain Allow List must include every external domain the app connects to
+- The Domain Allow List and your CSP headers must mirror each other
 
 ## State of the Art
 
 | Old Approach | Current Approach | When Changed | Impact |
 |--------------|------------------|--------------|--------|
-| JWT app type | General (OAuth) app type | 2023 | JWT deprecated, must use OAuth |
-| Redirect-based OAuth | In-client OAuth (authorize + PKCE) | SDK 0.16+ | No external redirects, smoother UX |
-| CDN SDK script tag | NPM @zoom/appssdk | v0.16+ | Better TypeScript support, tree-shaking |
-| frame-ancestors * | frame-ancestors https://*.zoom.us | Security update | Must explicitly allow Zoom to frame your app |
+| JWT apps | OAuth / Server-to-Server OAuth | Sept 2023 | JWT fully deprecated; must use OAuth |
+| Separate Zoom App types | General App with selectable features | 2024 | Single app type, features selected during config |
+| CDN-loaded SDK script tag | npm @zoom/appssdk | 2023+ | npm preferred, better TS support |
+| Cookie-based sessions | Server-side sessions keyed by user_id | Ongoing | Zoom clears cookies; must use server storage |
 
 **Deprecated/outdated:**
-- JWT app type: Fully deprecated by Zoom. Use General (OAuth) app.
-- `sendAppInvitation` event name changed to just `sendAppInvitation` (old: `onSendAppInvitation`)
-- SDK version "0.14" is deprecated in favor of "0.16"
+- JWT app type: Fully deprecated, cannot create new ones
+- Zoom Apps SDK via CDN script tag: Still works but npm package is standard
+- In-client OAuth for unpublished apps: Was never available; use traditional OAuth or SDK-only
 
 ## Open Questions
 
-1. **Vercel domain for Home URL**
-   - What we know: The panel is configured for Vercel deployment. Vercel provides automatic HTTPS.
-   - What's unclear: The exact Vercel domain isn't set up yet (Phase 6 handles deployment).
-   - Recommendation: For development, use ngrok tunnel. For production, use Vercel custom domain or default `.vercel.app` domain. Marketplace config can be updated.
+1. **Do We Actually Need OAuth?**
+   - What we know: The panel's data comes from the engine via WebSocket, NOT from Zoom REST APIs. The SDK `config()` call works for basic capabilities (getMeetingContext, getUserContext) without OAuth tokens. OAuth is only needed if the panel needs to call Zoom REST APIs directly (e.g., list participants, manage recordings).
+   - What's unclear: Whether any planned feature requires Zoom REST API access.
+   - Recommendation: **Start without OAuth.** Use SDK-only capabilities. The panel gets meeting context from the SDK and everything else from the engine WebSocket. Add OAuth later only if a specific Zoom API call is needed. This eliminates the need for a backend token exchange endpoint and simplifies deployment significantly (pure SPA on Vercel).
 
-2. **Token storage strategy for single user**
-   - What we know: Only Julian uses this app. Tokens need to survive engine restarts.
-   - What's unclear: Whether to use a file, env var, or simple SQLite for token persistence.
-   - Recommendation: Use a JSON file on the VPS (e.g., `~/.meeting-copilot/tokens.json`). Simple, no database needed for single user.
+2. **Exact Sidebar Dimensions**
+   - What we know: Collapsed view is approximately 280-320px. Users can drag to resize via a handlebar. There are collapsed, expanded, and pop-out modes. No fixed documented dimensions.
+   - What's unclear: Exact minimum width across OS platforms.
+   - Recommendation: Design for 280px minimum width. Use fluid layout (no fixed widths). Test on macOS Zoom client.
 
-3. **Development testing without Zoom**
-   - What we know: The panel already has standalone mode (catches SDK init failure).
-   - What's unclear: How much of the OAuth flow can be tested outside Zoom.
-   - Recommendation: Keep the standalone mode fallback. Mock the Zoom SDK in development. Test OAuth flow only in actual Zoom client via ngrok.
+3. **Vercel Domain for Home URL**
+   - What we know: The panel is configured for Vercel deployment. Vercel provides automatic HTTPS (required by Zoom).
+   - What's unclear: The exact Vercel project/domain isn't set up yet.
+   - Recommendation: Deploy to Vercel first with a temporary `.vercel.app` domain, configure Zoom Marketplace with that domain. Can switch to custom domain later. Marketplace config can be updated at any time.
+
+4. **Development Testing Without Zoom**
+   - What we know: The panel already has standalone mode (catches SDK init failure gracefully).
+   - What's unclear: How to test the full Zoom integration loop locally.
+   - Recommendation: Keep standalone mode for UI development. For Zoom integration testing, use ngrok to tunnel localhost to HTTPS, configure that as Home URL temporarily. Only final testing needs actual Vercel deployment.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `@zoom/appssdk` v0.16.37 `sdk.d.ts` - Installed package, read directly. All type definitions, API signatures, and capability enums verified from source.
-- [Zoom Apps SDK API Reference](https://appssdk.zoom.us/classes/ZoomSdk.ZoomSdk.html) - Official TypeDoc reference
-- [Zoom Apps SDK GitHub](https://github.com/zoom/appssdk) - Source code and README
+- [Zoom Apps Authentication](https://developers.zoom.us/docs/zoom-apps/authentication/) - OAuth flow details, critical note about unpublished apps
+- [Zoom Apps OWASP Headers](https://developers.zoom.us/docs/zoom-apps/security/owasp/) - Required 4 security headers
+- [Zoom Platform Key Concepts](https://developers.zoom.us/docs/platform/key-concepts/) - App types: private, beta, published, unlisted
+- [Create a Zoom App](https://developers.zoom.us/docs/zoom-apps/create/) - Registration workflow
+- [Select General App Features](https://developers.zoom.us/docs/build-flow/create-oauth-apps/) - Feature selection, management types
+- [Zoom Apps Components & Capabilities](https://developers.zoom.us/docs/zoom-apps/design/components-and-capabilities/) - Side panel modes (collapsed, expanded, pop-out)
+- [Zoom Apps SDK API Reference](https://appssdk.zoom.us/types/ZoomSdkTypes.Apis.html) - Full API list
 
 ### Secondary (MEDIUM confidence)
-- [Zoom Developer Docs - Create a Zoom App](https://developers.zoom.us/docs/zoom-apps/create/) - Marketplace registration steps
-- [Zoom Developer Docs - Security Guidelines](https://developers.zoom.us/docs/zoom-apps/security/) - CSP, TLS, OWASP requirements
-- [Zoom Developer Docs - Internal Apps](https://developers.zoom.us/docs/internal-apps/) - Private app configuration
-- [Zoom Advanced React Sample](https://github.com/zoom/zoomapps-advancedsample-react) - Official reference implementation with OAuth, session management
-- [Zoom Developer Forum - WebSocket in Zoom Apps](https://devforum.zoom.us/t/can-i-use-websocket-in-zoom-apps/84848) - Official confirmation WebSockets work with CSP config
-- [Zoom Developer Forum - WebSocket Connection Fix](https://devforum.zoom.us/t/cannot-connect-to-websocket-in-zoom-app/102782) - Domain Allow List vs OAuth Allow List distinction
+- [Zoom Apps Advanced React Sample](https://github.com/zoom/zoomapps-advancedsample-react) - Reference architecture with OAuth, Express backend, Redis sessions
+- [Zoom CSP Forum Discussion](https://devforum.zoom.us/t/what-is-an-appropiate-content-security-policy-csp-for-embedding-an-application-on-the-zoom-client/73158) - Recommended CSP values
+- [Side Panel Width Forum](https://devforum.zoom.us/t/zoom-right-panel-default-width/88837) - Width is variable by OS/display
+- [Side Panel Resize Forum](https://devforum.zoom.us/t/is-there-a-way-to-resize-the-zoom-app-side-panel-for-the-user-using-code-or-setting/87267) - ~320px collapsed, no programmatic resize API
 
 ### Tertiary (LOW confidence)
-- [ngrok + Zoom Apps blog](https://ngrok.com/blog/building-zoom-apps-with-ngrok) - Development tunnel setup (community source, verified pattern)
+- [Cookies Cleared Forum](https://devforum.zoom.us/t/cookies-and-localstorage-gets-clear-after-closing-app/109516) - localStorage/cookies cleared on app close (forum report)
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH - All packages already installed and verified from node_modules
-- Zoom SDK API surface: HIGH - Read directly from installed sdk.d.ts type definitions
-- Marketplace registration steps: MEDIUM - Verified from official docs but UI may have changed
-- OAuth in-client flow: HIGH - API types verified from SDK, pattern confirmed in official sample app
-- WebSocket in Zoom iframe: HIGH - Confirmed working by Zoom staff on dev forum, CSP config documented
-- Side panel constraints: MEDIUM - Width constraints inferred from popout size constraints in SDK types + community reports
-- CSP configuration: MEDIUM - Verified from forum discussions and security docs, exact headers may need testing
+- Standard stack: HIGH - verified from existing package.json and node_modules, no new deps needed
+- Architecture patterns: MEDIUM - patterns derived from Zoom sample apps + React best practices; sidebar dimensions approximate
+- Zoom registration: MEDIUM - official docs cover General App creation; Meeting Side Panel is enabled via "Zoom Apps SDK" feature selection
+- OWASP headers: HIGH - officially documented, app will not render without all 4 headers
+- OAuth flow: HIGH - official docs confirm in-client OAuth unavailable for unpublished apps
+- Side panel constraints: MEDIUM - combination of official docs (variable width, handlebar resize) and forum reports (~280-320px collapsed)
+- Pitfalls: MEDIUM - combination of official docs and developer forum reports
 
 **Research date:** 2026-03-20
-**Valid until:** 2026-04-20 (Zoom SDK is relatively stable, marketplace UI changes slowly)
+**Valid until:** 2026-04-20 (Zoom SDK stable, no major changes expected in 30 days)
