@@ -15,101 +15,23 @@ import json
 import logging
 import sys
 import time
-from datetime import datetime, timezone
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-from context.contacts import AttendeeIdentity, resolve_attendees
-from context.fireflies import TranscriptSummary, fetch_meeting_history
-from context.linear_client import LinearIssue, LinearProject, fetch_linear_projects
-from context.profiles import ClientProfile, load_client_profile
+from context.models import (
+    AttendeeContext,
+    AttendeeIdentity,
+    ClientProfile,
+    LinearProject,
+    TranscriptSummary,
+    UnifiedMeetingContext,
+)
+from context.contacts import resolve_attendees
+from context.fireflies import fetch_meeting_history
+from context.linear_client import fetch_linear_projects
+from context.profiles import load_client_profile
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Unified context models
-# ---------------------------------------------------------------------------
-
-
-class AttendeeContext(BaseModel):
-    """Complete context for a single meeting attendee."""
-
-    identity: AttendeeIdentity
-    meeting_history: list[TranscriptSummary] = Field(default_factory=list)
-    linear_projects: list[LinearProject] = Field(default_factory=list)
-    client_profile: ClientProfile | None = None
-
-
-class UnifiedMeetingContext(BaseModel):
-    """Full assembled context for a meeting, ready for LLM consumption."""
-
-    meeting_title: str | None = None
-    assembled_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    load_time_seconds: float = 0.0
-    attendees: list[AttendeeContext] = Field(default_factory=list)
-    errors: list[str] = Field(default_factory=list)
-
-    def to_classifier_prompt(self) -> str:
-        """Produce readable text summary for LLM context injection."""
-        lines: list[str] = []
-        if self.meeting_title:
-            lines.append(f"Meeting: {self.meeting_title}")
-        lines.append(f"Attendees: {len(self.attendees)}")
-        lines.append("")
-
-        for att in self.attendees:
-            ident = att.identity
-            name = ident.name or ident.email
-            lines.append(f"--- {name} ---")
-            lines.append(f"  Email: {ident.email}")
-            if ident.company:
-                lines.append(f"  Company: {ident.company}")
-            if ident.title:
-                lines.append(f"  Title: {ident.title}")
-
-            if att.meeting_history:
-                lines.append(f"  Past meetings: {len(att.meeting_history)}")
-                for hist in att.meeting_history[:3]:
-                    date_str = hist.date.strftime("%Y-%m-%d") if hist.date else "unknown"
-                    lines.append(f"    - {hist.title} ({date_str})")
-                    if hist.summary:
-                        lines.append(f"      Summary: {hist.summary[:120]}...")
-                    if hist.action_items:
-                        for item in hist.action_items[:3]:
-                            lines.append(f"      Action: {item[:100]}")
-
-            if att.linear_projects:
-                lines.append(f"  Linear projects: {len(att.linear_projects)}")
-                for proj in att.linear_projects:
-                    lines.append(
-                        f"    - {proj.name} ({proj.key}): "
-                        f"{proj.issue_count} open issues"
-                    )
-                    for issue in proj.open_issues[:5]:
-                        lines.append(
-                            f"      [{issue.identifier}] {issue.title} "
-                            f"({issue.status})"
-                        )
-
-            if att.client_profile:
-                prof = att.client_profile
-                lines.append(f"  Client profile: {prof.name}")
-                if prof.communication_style:
-                    lines.append(f"    Communication: {prof.communication_style}")
-                if prof.formality:
-                    lines.append(f"    Formality: {prof.formality}")
-                if prof.relationship:
-                    lines.append(f"    Relationship: {prof.relationship}")
-
-            lines.append("")
-
-        if self.errors:
-            lines.append(f"Context errors ({len(self.errors)}):")
-            for err in self.errors:
-                lines.append(f"  - {err}")
-
-        return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
