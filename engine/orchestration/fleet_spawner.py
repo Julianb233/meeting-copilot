@@ -46,8 +46,9 @@ class FleetSpawner:
     based on action type specialization and current availability.
     """
 
-    def __init__(self, tracker: TaskTracker):
+    def __init__(self, tracker: TaskTracker, broadcast_fn=None):
         self.tracker = tracker
+        self.broadcast_fn = broadcast_fn
         self.logger = logging.getLogger("copilot.orchestration.spawner")
 
     def select_agent(self, intent: Intent) -> str:
@@ -161,16 +162,22 @@ class FleetSpawner:
 
             if proc.returncode == 0:
                 result = stdout.decode().strip() or "Task dispatched"
-                self.tracker.complete_task(task_id, result)
+                task = self.tracker.complete_task(task_id, result)
                 self.logger.info("Task %s completed: %s", task_id[:8], result[:80])
+                if task and self.broadcast_fn:
+                    await self.broadcast_fn(task.model_dump(mode="json"), "completed")
             else:
                 error = stderr.decode().strip() or "Process failed"
-                self.tracker.fail_task(task_id, error)
+                task = self.tracker.fail_task(task_id, error)
                 self.logger.error("Task %s failed: %s", task_id[:8], error[:80])
+                if task and self.broadcast_fn:
+                    await self.broadcast_fn(task.model_dump(mode="json"), "failed")
 
         except asyncio.TimeoutError:
-            self.tracker.fail_task(task_id, "Process timed out after 300s")
+            task = self.tracker.fail_task(task_id, "Process timed out after 300s")
             self.logger.error("Task %s timed out", task_id[:8])
+            if task and self.broadcast_fn:
+                await self.broadcast_fn(task.model_dump(mode="json"), "failed")
             try:
                 proc.kill()
             except ProcessLookupError:

@@ -147,9 +147,7 @@ class ConnectionManager:
             )
 
             if batch.intents:
-                await self._process_intents(batch.intents, meeting_title)
-
-                # Broadcast detected intents to panel
+                # Broadcast detected intents to panel first (low-latency feedback)
                 msg = EngineIntentsDetected(
                     intents=[i.model_dump() for i in batch.intents],
                     model_used=batch.model_used,
@@ -162,6 +160,9 @@ class ConnectionManager:
                 self.state.intents.extend(
                     [i.model_dump() for i in batch.intents]
                 )
+
+                # Route to Linear and spawn agents
+                await self._process_intents(batch.intents, meeting_title)
 
             # Store transcript chunks in state
             for s in sentences:
@@ -213,6 +214,18 @@ class ConnectionManager:
 
         except Exception:
             logger.exception("Error processing intents")
+
+    async def _broadcast_task_update(self, task_data: dict, event: str) -> None:
+        """Callback for FleetSpawner to broadcast task state changes."""
+        update = EngineTaskUpdate(task=task_data, event=event)
+        await self.broadcast(update.model_dump(mode="json"))
+
+        # Also broadcast updated agent status after task state change
+        agent_status = self.tracker.get_agent_status()
+        status_msg = EngineAgentStatus(
+            agents=[AgentStatus(**a) for a in agent_status]
+        )
+        await self.broadcast(status_msg.model_dump(mode="json"))
 
     async def _handle_task_action(self, task_id: str, action: str) -> None:
         """Handle task_action messages (cancel/retry)."""
