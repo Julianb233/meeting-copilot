@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Meeting Copilot Engine — deploy to VPS
+# Meeting Copilot Engine -- deploy to VPS
 # Usage: bash deploy/deploy-engine.sh
 
 ENGINE_DIR="/opt/agency-workspace/meeting-copilot/engine"
@@ -35,4 +35,4 @@ sudo systemctl restart $SERVICE_NAME
 
 echo "=== Deployment complete ==="
 echo "Engine status: $(systemctl is-active $SERVICE_NAME)"
-echo "Health check: curl https://copilot-api.agency.dev/api/health"
+echo "Health check: curl https://copilot-api.agency.dev/health"

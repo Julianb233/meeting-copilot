@@ -1,15 +1,15 @@
 [Unit]
-Description=Meeting Copilot Engine
+Description=Meeting Copilot Engine (WS:8900 + REST:8901)
 After=network.target
 
 [Service]
 Type=simple
-User=agent4
-Group=agency
+User=root
 WorkingDirectory=/opt/agency-workspace/meeting-copilot/engine
 ExecStart=/opt/agency-workspace/meeting-copilot/engine/.venv/bin/python main.py
 Restart=always
 RestartSec=5
+Environment=PYTHONUNBUFFERED=1
 EnvironmentFile=/opt/agency-workspace/meeting-copilot/engine/.env
 
 # Logging
