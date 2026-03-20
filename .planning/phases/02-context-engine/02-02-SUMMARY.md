@@ -18,7 +18,7 @@ key-files:
     - engine/pyproject.toml
 decisions:
   - id: D-0202-1
-    description: "Direct imports (not relative) for engine/ subpackages since engine/ is the runtime working directory"
+    description: "try/except import pattern for config — prefers relative import, falls back to direct import for runtime flexibility"
   - id: D-0202-2
     description: "Client-side participant filtering — Fireflies API does not support server-side participant filtering"
 metrics:
@@ -47,24 +47,24 @@ Async GraphQL loader that fetches past Fireflies transcripts for a given attende
 
 | ID | Decision | Rationale |
 |----|----------|-----------|
-| D-0202-1 | Direct imports for config module | engine/ is the runtime cwd; relative imports fail when importing from context/ subpackage |
+| D-0202-1 | try/except import pattern for config | Prefers relative import (`from .. import config`) for package usage, falls back to direct `import config` for standalone execution |
 | D-0202-2 | Client-side participant filtering | Fireflies `transcripts` query has no participant filter parameter; must fetch batch and filter locally |
 
 ## Deviations from Plan
 
 ### Auto-fixed Issues
 
-**1. [Rule 3 - Blocking] Ruff isort converting direct imports to relative**
+**1. [Rule 3 - Blocking] Import resolution across execution contexts**
 
-- **Found during:** Task 1 commit
-- **Issue:** Ruff's isort rule was rewriting `import config` to `from .. import config`, which breaks at runtime because `engine/` is not installed as a package
-- **Fix:** Added `[tool.ruff.lint.isort] known-first-party` config listing engine's top-level modules
-- **Files modified:** engine/pyproject.toml, engine/context/fireflies.py
-- **Commits:** eda2928, a385446
+- **Found during:** Task 1 verification
+- **Issue:** `import config` works when cwd is engine/, `from .. import config` works when imported as package -- linter conflicts with both approaches
+- **Fix:** Used try/except import pattern: tries relative first, falls back to direct import
+- **Files modified:** engine/context/fireflies.py
+- **Commits:** a3ccd82
 
 ## Verification Results
 
-- Import test: `from context.fireflies import fetch_meeting_history, TranscriptSummary` -- OK
+- Import test: `from engine.context.fireflies import fetch_meeting_history, TranscriptSummary` -- OK
 - CLI test: `python -m context.fireflies` -- returns [] gracefully (API returns 500 with current key)
 - No new pip dependencies required (httpx already in requirements.txt)
 
@@ -75,3 +75,4 @@ Async GraphQL loader that fetches past Fireflies transcripts for a given attende
 | 6adcea2 | feat(02-02): add Fireflies meeting history loader |
 | eda2928 | fix(02-02): use direct import for config (not relative) |
 | a385446 | fix(02-02): configure ruff isort known-first-party modules |
+| a3ccd82 | docs(02-02): complete Fireflies loader plan -- summary and import fix |

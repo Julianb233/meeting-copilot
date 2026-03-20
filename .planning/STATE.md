@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 2 of 6 (Context Engine)
-Plan: 02-01 summary created (4 of phase 2 done)
+Plan: 02-02 complete (Fireflies loader verified)
 Status: In progress
-Last activity: 2026-03-20 — Completed 02-01 (attendee identity resolution)
+Last activity: 2026-03-20 — Completed 02-02 (Fireflies meeting history loader)
 
-Progress: ████████░░ ~40%
+Progress: ████████░░ ~45%
 
 ## Performance Metrics
 
@@ -52,6 +52,8 @@ Recent decisions affecting current work:
 - D-0204-1: Use pyyaml for YAML frontmatter parsing (reliable, worth the dependency)
 - D-0204-2: Search client-profiles/ before Obsidian contacts (richer data first)
 - D-0204-3: Trim raw_content to 2000 chars for LLM context injection
+- D-0202-1: try/except import pattern for config — prefers relative import, falls back to direct for runtime flexibility
+- D-0202-2: Client-side participant filtering — Fireflies API has no server-side participant filter
 - D-0203-1: Use direct `import config` pattern matching existing codebase convention
 - D-0201-1: Shell out to gws CLI for Google Contacts (avoids OAuth credential management)
 - D-0201-2: Skip default silhouette photos (no useful identity signal)
@@ -69,6 +71,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:25 UTC
-Stopped at: Completed 02-01-PLAN.md — Attendee identity resolution
+Last session: 2026-03-20 21:22 UTC
+Stopped at: Completed 02-02-PLAN.md — Fireflies meeting history loader
 Resume file: None
