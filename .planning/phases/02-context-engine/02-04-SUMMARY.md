@@ -71,6 +71,7 @@ None — plan executed exactly as written.
 | Hash | Message |
 |------|---------|
 | 6adcea2 | feat(02-04): add client profile loader from Obsidian vault |
+| e3a298a | feat(02-04): client profile loader from filesystem (cleanup) |
 
 ## Next Phase Readiness
 
