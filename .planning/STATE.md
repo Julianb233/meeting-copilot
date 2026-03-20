@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** The meeting IS the work — copilot detects needs and executes work during the meeting, not after.
-**Current focus:** Phase 4 — Zoom Panel
+**Current focus:** Phase 3 + Phase 4 (parallel execution)
 
 ## Current Position
 
-Phase: 4 of 6 (Zoom Panel)
-Plan: 1 of 4 complete (OWASP headers + Zoom SDK hook)
+Phase: 3-4 of 6 (Intent Orchestration + Zoom Panel)
+Plan: 03-03 just completed, 04-01 done
 Status: In progress
-Last activity: 2026-03-20 — Completed 04-01 (OWASP headers + useZoomContext hook)
+Last activity: 2026-03-20 — Completed 03-03 (Task orchestration — fleet spawner + tracker)
 
-Progress: ██████████░ ~60%
+Progress: ████████████░ ~65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: ~2.4 min
-- Total execution time: ~26.5 min
+- Total plans completed: 12
+- Average duration: ~2.3 min
+- Total execution time: ~27.5 min
 
 **By Phase:**
 
@@ -29,11 +29,12 @@ Progress: ██████████░ ~60%
 |-------|-------|-------|----------|
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
 | 2 | 6/6 | ~13.1 min | ~2.2 min |
+| 3 | 1/4 | ~1 min | ~1 min |
 | 4 | 1/4 | ~1 min | ~1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (fireflies), 02-03 (linear), 02-04 (profiles), 02-05 (assembler), 04-01 (OWASP + Zoom hook)
-- Trend: Fast execution, sub-minute plan for straightforward config tasks
+- Last 5 plans: 02-04 (profiles), 02-05 (assembler), 02-06 (git), 04-01 (OWASP + Zoom hook), 03-03 (orchestration)
+- Trend: Fast execution, sub-minute plans for focused implementation tasks
 
 ## Accumulated Context
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - D-0401-2: Running context check before getMeetingContext to avoid errors outside meetings
 - D-0206-1: Shell out to git log via asyncio subprocess (avoids gitpython dependency)
 - D-0206-2: Parse Repo(s) from client-profiles markdown using regex (table and bold formats)
+- D-0303-1: v1 fleet dispatch via iMessage (god mac send) — proper fleet gateway in Phase 6
+- D-0303-2: Agent selection prefers idle specialists, falls back to any idle, then queues
 
 ### Pending Todos
 
@@ -78,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:36 UTC
-Stopped at: Completed 02-06-PLAN.md — Git activity loader (Phase 2 complete)
+Last session: 2026-03-20 21:37 UTC
+Stopped at: Completed 03-03-PLAN.md — Task orchestration (fleet spawner + tracker)
 Resume file: None
