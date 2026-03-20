@@ -6,7 +6,7 @@ Build a Zoom companion panel that executes work during meetings. Six phases: sca
 
 ## Phases
 
-- [ ] **Phase 1: Scaffold & Infrastructure** - Next.js project, Python engine, WebSocket, REST API
+- [ ] **Phase 1: Scaffold & Infrastructure** - Vite+React panel, FastAPI engine (WS+REST on port 8900), nginx TLS
 - [ ] **Phase 2: Context Engine** - Load full attendee context from all data sources at meeting start
 - [ ] **Phase 3: Intent Detection & Task Orchestration** - Understand intents, route to projects, spawn agents
 - [ ] **Phase 4: Zoom Companion Panel UI** - React sidebar with live tasks, status, quick actions
@@ -20,18 +20,17 @@ Build a Zoom companion panel that executes work during meetings. Six phases: sca
 **Depends on**: Nothing (first phase)
 **Requirements**: COM-01, COM-02, COM-03
 **Success Criteria** (what must be TRUE):
-  1. Next.js 15 app builds and runs locally
-  2. Python engine starts with WebSocket server on port 8900
-  3. REST API responds on port 8901 with health check
+  1. Vite+React 19 app builds and runs locally (Zoom iframe — no SSR needed)
+  2. FastAPI engine starts with WebSocket at /ws and REST API at /api/* on port 8900
+  3. GET /api/health returns 200 with JSON payload
   4. WebSocket messages flow bidirectionally between panel and engine
   5. Nginx config proxies WebSocket with TLS
-**Plans**: 4 plans
+**Plans**: 3 plans
 
 Plans:
-- [ ] 01-01: Scaffold Next.js 15 + React 19 app with Zoom Apps SDK boilerplate
-- [ ] 01-02: Scaffold Python copilot engine with WebSocket server (port 8900) and REST API (port 8901)
-- [ ] 01-03: Nginx reverse proxy config for WebSocket TLS on VPS
-- [ ] 01-04: Basic project structure — shared types, env config, deployment scripts
+- [ ] 01-01: Scaffold Vite + React 19 panel with Zoom Apps SDK and Tailwind
+- [ ] 01-02: Scaffold FastAPI engine with WebSocket (/ws) and REST API (/api/*) on port 8900
+- [ ] 01-03: Wire panel to engine (shared types, WebSocket hook, Zustand store), nginx reverse proxy, systemd service, deployment scripts
 
 ### Phase 2: Context Engine
 **Goal**: On meeting start, load full attendee context from all data sources
@@ -123,7 +122,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Scaffold & Infrastructure | 0/4 | Not started | - |
+| 1. Scaffold & Infrastructure | 0/3 | Not started | - |
 | 2. Context Engine | 0/5 | Not started | - |
 | 3. Intent & Orchestration | 0/4 | Not started | - |
 | 4. Zoom Panel UI | 0/4 | Not started | - |
