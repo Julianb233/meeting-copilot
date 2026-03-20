@@ -144,6 +144,10 @@ def extract_prior_context(
     return result
 
 
+# Alias for convenience — some callers use this name
+summarize_prior_meetings = extract_prior_context
+
+
 if __name__ == "__main__":
     from context.contacts import AttendeeIdentity
     from context.fireflies import TranscriptSummary
