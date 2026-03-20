@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** The meeting IS the work — copilot detects needs and executes work during the meeting, not after.
-**Current focus:** Phase 1 — Project Scaffold & Infrastructure
+**Current focus:** Phase 2 — Context Engine
 
 ## Current Position
 
-Phase: 1 of 6 (Project Scaffold & Infrastructure)
-Plan: 3 of 3 complete
-Status: Phase complete
-Last activity: 2026-03-20 — Completed 01-03-PLAN.md (panel-engine integration + deploy config)
+Phase: 2 of 6 (Context Engine)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-20 — Completed 01-04 (root config + deploy artifacts)
 
 Progress: ██████░░░░ ~25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: ~3.4 min
-- Total execution time: ~10.4 min
+- Total plans completed: 4
+- Average duration: ~3.1 min
+- Total execution time: ~12.4 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 3/3 | ~10.4 min | ~3.4 min |
+| 1 | 4/4 | ~12.4 min | ~3.1 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (panel scaffold), 01-02 (engine scaffold), 01-03 (integration + deploy)
+- Last 5 plans: 01-01 (panel scaffold), 01-02 (engine scaffold), 01-03 (integration + deploy), 01-04 (root config + deploy)
 - Trend: Fast execution, clean results
 
 ## Accumulated Context
@@ -46,6 +46,8 @@ Recent decisions affecting current work:
 - D-0102-2: Use lifespan context manager over deprecated on_event
 - D-0103-1: react-use-websocket for WebSocket with auto-reconnect
 - D-0103-2: Zustand store actions mirror engine message types 1:1
+- D-0104-1: Nginx map block for WebSocket upgrade instead of hardcoded Connection header
+- D-0104-2: Separate /health and /state nginx locations proxying to REST port 8901
 
 ### Pending Todos
 
@@ -59,6 +61,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:11 UTC
-Stopped at: Completed 01-03-PLAN.md — Phase 1 complete
+Last session: 2026-03-20 21:20 UTC
+Stopped at: Completed 01-04-PLAN.md — Phase 1 fully complete (4/4 plans)
 Resume file: None
