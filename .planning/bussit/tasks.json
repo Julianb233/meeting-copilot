@@ -3,71 +3,75 @@
     "id": "01-plan",
     "type": "plan",
     "title": "Plan Phase 1: Scaffold & Infrastructure",
-    "description": "Create detailed execution plans for Phase 1 — Next.js scaffold, Python engine, WebSocket, REST API, nginx TLS",
+    "description": "Create detailed execution plans for Phase 1 \u2014 Next.js scaffold, Python engine, WebSocket, REST API, nginx TLS",
     "planPath": null,
     "project": "meeting-copilot",
     "phase": 1,
     "plan": 0,
     "priority": 100,
-    "status": "running",
+    "status": "completed",
     "dependencies": [],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
-    "assignedTo": "worker-Ubun-9939",
-    "claimedAt": "2026-03-20T14:50:00Z",
-    "completedAt": null,
+    "assignedTo": "worker-Ubun-9930",
+    "claimedAt": "2026-03-20T13:53:00Z",
+    "completedAt": "2026-03-20T21:03:38.240418+00:00",
     "createdAt": "2026-03-20T13:55:00Z",
-    "result": null,
-    "executionTime": 0,
+    "result": "3 plans created in 2 waves",
+    "executionTime": 180,
     "retries": 0,
     "failureHistory": []
   },
   {
     "id": "01-01-build",
     "type": "build",
-    "title": "Scaffold Next.js 15 + React 19 app with Zoom Apps SDK boilerplate",
-    "description": "Create the Next.js panel application with Zoom Apps SDK integration",
-    "planPath": ".planning/phases/01-foundation-communication/01-01-PLAN.md",
+    "title": "Scaffold Vite + React 19 panel app with Zoom SDK",
+    "description": "Created panel/ with Vite, React 19, Zoom Apps SDK, Tailwind CSS v4, Zustand, Biome",
+    "planPath": ".planning/phases/01-scaffold-infrastructure/01-01-PLAN.md",
     "project": "meeting-copilot",
     "phase": 1,
     "plan": 1,
     "priority": 90,
-    "status": "pending",
-    "dependencies": ["01-plan"],
+    "status": "completed",
+    "dependencies": [
+      "01-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
-    "assignedTo": null,
-    "claimedAt": null,
-    "completedAt": null,
+    "assignedTo": "worker-Ubun-9930",
+    "claimedAt": "2026-03-20T21:04:14Z",
+    "completedAt": "2026-03-20T21:09:43.457308+00:00",
     "createdAt": "2026-03-20T13:55:00Z",
-    "result": null,
-    "executionTime": 0,
+    "result": "Panel scaffolded: Vite+React19+ZoomSDK+Tailwind+Zustand. Build passes.",
+    "executionTime": 343,
     "retries": 0,
     "failureHistory": []
   },
   {
     "id": "01-02-build",
     "type": "build",
-    "title": "Scaffold Python copilot engine with WebSocket (8900) and REST API (8901)",
-    "description": "Create the Python backend engine with WebSocket and REST servers",
-    "planPath": ".planning/phases/01-foundation-communication/01-02-PLAN.md",
+    "title": "Scaffold Python copilot engine with WebSocket + REST API",
+    "description": "Created engine/ with FastAPI, WebSocket handler, REST API, Pydantic models",
+    "planPath": ".planning/phases/01-scaffold-infrastructure/01-02-PLAN.md",
     "project": "meeting-copilot",
     "phase": 1,
     "plan": 2,
     "priority": 90,
-    "status": "pending",
-    "dependencies": ["01-plan"],
+    "status": "completed",
+    "dependencies": [
+      "01-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
-    "assignedTo": null,
-    "claimedAt": null,
-    "completedAt": null,
+    "assignedTo": "worker-Ubun-9930",
+    "claimedAt": "2026-03-20T21:04:14Z",
+    "completedAt": "2026-03-20T21:11:01.481646+00:00",
     "createdAt": "2026-03-20T13:55:00Z",
-    "result": null,
-    "executionTime": 0,
+    "result": "Engine scaffolded: FastAPI+WebSocket+REST+Pydantic. Health/state endpoints working.",
+    "executionTime": 417,
     "retries": 0,
     "failureHistory": []
   },
@@ -76,18 +80,20 @@
     "type": "build",
     "title": "Nginx reverse proxy config for WebSocket TLS on VPS",
     "description": "Configure nginx to proxy WebSocket connections with TLS termination",
-    "planPath": ".planning/phases/01-foundation-communication/01-03-PLAN.md",
+    "planPath": ".planning/phases/01-scaffold-infrastructure/01-03-PLAN.md",
     "project": "meeting-copilot",
     "phase": 1,
     "plan": 3,
     "priority": 80,
-    "status": "pending",
-    "dependencies": ["01-plan"],
+    "status": "running",
+    "dependencies": [
+      "01-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
-    "assignedTo": null,
-    "claimedAt": null,
+    "assignedTo": "worker-Ubun-9924",
+    "claimedAt": "2026-03-20T21:11:01.481646+00:00",
     "completedAt": null,
     "createdAt": "2026-03-20T13:55:00Z",
     "result": null,
@@ -98,23 +104,25 @@
   {
     "id": "01-04-build",
     "type": "build",
-    "title": "Basic project structure — shared types, env config, deployment scripts",
+    "title": "Basic project structure \u2014 shared types, env config, deployment scripts",
     "description": "Set up shared configuration, type definitions, and deployment automation",
-    "planPath": ".planning/phases/01-foundation-communication/01-04-PLAN.md",
+    "planPath": ".planning/phases/01-scaffold-infrastructure/01-03-PLAN.md",
     "project": "meeting-copilot",
     "phase": 1,
     "plan": 4,
     "priority": 80,
-    "status": "pending",
-    "dependencies": ["01-plan"],
+    "status": "completed",
+    "dependencies": [
+      "01-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
     "assignedTo": null,
     "claimedAt": null,
-    "completedAt": null,
+    "completedAt": "2026-03-20T21:03:38.240418+00:00",
     "createdAt": "2026-03-20T13:55:00Z",
-    "result": null,
+    "result": "Merged into 01-03",
     "executionTime": 0,
     "retries": 0,
     "failureHistory": []
@@ -123,14 +131,19 @@
     "id": "02-plan",
     "type": "plan",
     "title": "Plan Phase 2: Context Engine",
-    "description": "Create detailed execution plans for Phase 2 — attendee identity, meeting history, Linear projects, client profiles",
+    "description": "Create detailed execution plans for Phase 2 \u2014 attendee identity, meeting history, Linear projects, client profiles",
     "planPath": null,
     "project": "meeting-copilot",
     "phase": 2,
     "plan": 0,
     "priority": 70,
     "status": "pending",
-    "dependencies": ["01-01-build", "01-02-build", "01-03-build", "01-04-build"],
+    "dependencies": [
+      "01-01-build",
+      "01-02-build",
+      "01-03-build",
+      "01-04-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -146,7 +159,7 @@
   {
     "id": "02-01-build",
     "type": "build",
-    "title": "Attendee identity resolution — Google Contacts API lookup by email",
+    "title": "Attendee identity resolution \u2014 Google Contacts API lookup by email",
     "description": "Resolve attendee identities from Google Contacts People API",
     "planPath": ".planning/phases/02-context-engine/02-01-PLAN.md",
     "project": "meeting-copilot",
@@ -154,7 +167,9 @@
     "plan": 1,
     "priority": 60,
     "status": "pending",
-    "dependencies": ["02-plan"],
+    "dependencies": [
+      "02-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -170,7 +185,7 @@
   {
     "id": "02-02-build",
     "type": "build",
-    "title": "Meeting history loader — Fireflies API for last 3 transcripts",
+    "title": "Meeting history loader \u2014 Fireflies API for last 3 transcripts",
     "description": "Load recent Fireflies transcripts for each meeting attendee",
     "planPath": ".planning/phases/02-context-engine/02-02-PLAN.md",
     "project": "meeting-copilot",
@@ -178,7 +193,9 @@
     "plan": 2,
     "priority": 60,
     "status": "pending",
-    "dependencies": ["02-plan"],
+    "dependencies": [
+      "02-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -194,7 +211,7 @@
   {
     "id": "02-03-build",
     "type": "build",
-    "title": "Linear project mapper — map attendee to projects and open issues",
+    "title": "Linear project mapper \u2014 map attendee to projects and open issues",
     "description": "Map attendee email/org to Linear projects and load open issues",
     "planPath": ".planning/phases/02-context-engine/02-03-PLAN.md",
     "project": "meeting-copilot",
@@ -202,7 +219,9 @@
     "plan": 3,
     "priority": 60,
     "status": "pending",
-    "dependencies": ["02-plan"],
+    "dependencies": [
+      "02-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -218,7 +237,7 @@
   {
     "id": "02-04-build",
     "type": "build",
-    "title": "Client profile loader — read from Obsidian vault",
+    "title": "Client profile loader \u2014 read from Obsidian vault",
     "description": "Load client profiles from Obsidian vault markdown files",
     "planPath": ".planning/phases/02-context-engine/02-04-PLAN.md",
     "project": "meeting-copilot",
@@ -226,7 +245,9 @@
     "plan": 4,
     "priority": 60,
     "status": "pending",
-    "dependencies": ["02-plan"],
+    "dependencies": [
+      "02-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -242,7 +263,7 @@
   {
     "id": "02-05-build",
     "type": "build",
-    "title": "Context assembler — merge all sources into unified context object",
+    "title": "Context assembler \u2014 merge all sources into unified context object",
     "description": "Merge Google Contacts, Fireflies, Linear, Obsidian, and git into unified context",
     "planPath": ".planning/phases/02-context-engine/02-05-PLAN.md",
     "project": "meeting-copilot",
@@ -250,7 +271,12 @@
     "plan": 5,
     "priority": 55,
     "status": "pending",
-    "dependencies": ["02-01-build", "02-02-build", "02-03-build", "02-04-build"],
+    "dependencies": [
+      "02-01-build",
+      "02-02-build",
+      "02-03-build",
+      "02-04-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -267,14 +293,16 @@
     "id": "03-plan",
     "type": "plan",
     "title": "Plan Phase 3: Intent Detection & Task Orchestration",
-    "description": "Create detailed execution plans for Phase 3 — intent understanding, project routing, fleet spawning",
+    "description": "Create detailed execution plans for Phase 3 \u2014 intent understanding, project routing, fleet spawning",
     "planPath": null,
     "project": "meeting-copilot",
     "phase": 3,
     "plan": 0,
     "priority": 50,
     "status": "pending",
-    "dependencies": ["02-05-build"],
+    "dependencies": [
+      "02-05-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -290,7 +318,7 @@
   {
     "id": "03-01-build",
     "type": "build",
-    "title": "Intent detector — structured intent extraction from transcript",
+    "title": "Intent detector \u2014 structured intent extraction from transcript",
     "description": "Upgrade from sentence classification to structured intent extraction",
     "planPath": ".planning/phases/03-intent-orchestration/03-01-PLAN.md",
     "project": "meeting-copilot",
@@ -298,7 +326,9 @@
     "plan": 1,
     "priority": 45,
     "status": "pending",
-    "dependencies": ["03-plan"],
+    "dependencies": [
+      "03-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -314,7 +344,7 @@
   {
     "id": "03-02-build",
     "type": "build",
-    "title": "Project-aware routing — route intents to correct Linear project",
+    "title": "Project-aware routing \u2014 route intents to correct Linear project",
     "description": "Route detected intents to the correct Linear project based on meeting context",
     "planPath": ".planning/phases/03-intent-orchestration/03-02-PLAN.md",
     "project": "meeting-copilot",
@@ -322,7 +352,9 @@
     "plan": 2,
     "priority": 45,
     "status": "pending",
-    "dependencies": ["03-01-build"],
+    "dependencies": [
+      "03-01-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -338,7 +370,7 @@
   {
     "id": "03-03-build",
     "type": "build",
-    "title": "Task orchestrator — spawn fleet agents, track execution status",
+    "title": "Task orchestrator \u2014 spawn fleet agents, track execution status",
     "description": "Spawn fleet agents via god-mcp and track their execution status",
     "planPath": ".planning/phases/03-intent-orchestration/03-03-PLAN.md",
     "project": "meeting-copilot",
@@ -346,7 +378,9 @@
     "plan": 3,
     "priority": 45,
     "status": "pending",
-    "dependencies": ["03-plan"],
+    "dependencies": [
+      "03-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -370,7 +404,9 @@
     "plan": 4,
     "priority": 40,
     "status": "pending",
-    "dependencies": ["03-02-build"],
+    "dependencies": [
+      "03-02-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -387,14 +423,16 @@
     "id": "04-plan",
     "type": "plan",
     "title": "Plan Phase 4: Zoom Companion Panel UI",
-    "description": "Create detailed execution plans for Phase 4 — Zoom app, panel UI, WebSocket client, quick actions",
+    "description": "Create detailed execution plans for Phase 4 \u2014 Zoom app, panel UI, WebSocket client, quick actions",
     "planPath": null,
     "project": "meeting-copilot",
     "phase": 4,
     "plan": 0,
     "priority": 35,
-    "status": "pending",
-    "dependencies": ["01-04-build"],
+    "status": "running",
+    "dependencies": [
+      "01-04-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -410,7 +448,7 @@
   {
     "id": "04-01-build",
     "type": "build",
-    "title": "Zoom App registration — private app, OAuth flow",
+    "title": "Zoom App registration \u2014 private app, OAuth flow",
     "description": "Register Meeting Copilot as private Zoom Meeting Side Panel app with OAuth",
     "planPath": ".planning/phases/04-zoom-panel/04-01-PLAN.md",
     "project": "meeting-copilot",
@@ -418,7 +456,9 @@
     "plan": 1,
     "priority": 30,
     "status": "pending",
-    "dependencies": ["04-plan"],
+    "dependencies": [
+      "04-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -434,7 +474,7 @@
   {
     "id": "04-02-build",
     "type": "build",
-    "title": "Panel UI — task feed, status badges, completion indicators",
+    "title": "Panel UI \u2014 task feed, status badges, completion indicators",
     "description": "Build React panel UI with live task feed and status components",
     "planPath": ".planning/phases/04-zoom-panel/04-02-PLAN.md",
     "project": "meeting-copilot",
@@ -442,7 +482,9 @@
     "plan": 2,
     "priority": 30,
     "status": "pending",
-    "dependencies": ["04-01-build"],
+    "dependencies": [
+      "04-01-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -458,7 +500,7 @@
   {
     "id": "04-03-build",
     "type": "build",
-    "title": "WebSocket client — connect panel to engine for real-time events",
+    "title": "WebSocket client \u2014 connect panel to engine for real-time events",
     "description": "WebSocket client in panel connecting to engine for bidirectional events",
     "planPath": ".planning/phases/04-zoom-panel/04-03-PLAN.md",
     "project": "meeting-copilot",
@@ -466,7 +508,9 @@
     "plan": 3,
     "priority": 30,
     "status": "pending",
-    "dependencies": ["04-02-build"],
+    "dependencies": [
+      "04-02-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -482,7 +526,7 @@
   {
     "id": "04-04-build",
     "type": "build",
-    "title": "Quick action buttons — Delegate, Propose, Research, Email, Domain",
+    "title": "Quick action buttons \u2014 Delegate, Propose, Research, Email, Domain",
     "description": "Build quick action button components that trigger fleet agent skills",
     "planPath": ".planning/phases/04-zoom-panel/04-04-PLAN.md",
     "project": "meeting-copilot",
@@ -490,7 +534,9 @@
     "plan": 4,
     "priority": 25,
     "status": "pending",
-    "dependencies": ["04-03-build"],
+    "dependencies": [
+      "04-03-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -514,7 +560,9 @@
     "plan": 0,
     "priority": 20,
     "status": "pending",
-    "dependencies": ["03-04-build"],
+    "dependencies": [
+      "03-04-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -538,7 +586,9 @@
     "plan": 1,
     "priority": 15,
     "status": "pending",
-    "dependencies": ["05-plan"],
+    "dependencies": [
+      "05-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -562,7 +612,9 @@
     "plan": 2,
     "priority": 15,
     "status": "pending",
-    "dependencies": ["05-plan"],
+    "dependencies": [
+      "05-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -586,7 +638,9 @@
     "plan": 3,
     "priority": 15,
     "status": "pending",
-    "dependencies": ["05-plan"],
+    "dependencies": [
+      "05-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -610,7 +664,10 @@
     "plan": 0,
     "priority": 10,
     "status": "pending",
-    "dependencies": ["04-04-build", "05-03-build"],
+    "dependencies": [
+      "04-04-build",
+      "05-03-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -634,7 +691,9 @@
     "plan": 1,
     "priority": 5,
     "status": "pending",
-    "dependencies": ["06-plan"],
+    "dependencies": [
+      "06-plan"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -658,7 +717,9 @@
     "plan": 2,
     "priority": 5,
     "status": "pending",
-    "dependencies": ["06-01-build"],
+    "dependencies": [
+      "06-01-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
@@ -674,15 +735,17 @@
   {
     "id": "06-03-build",
     "type": "build",
-    "title": "End-to-end testing — full meeting flow simulation",
-    "description": "Simulate complete meeting flow: detect → context → intent → agent → panel → follow-up",
+    "title": "End-to-end testing \u2014 full meeting flow simulation",
+    "description": "Simulate complete meeting flow: detect \u2192 context \u2192 intent \u2192 agent \u2192 panel \u2192 follow-up",
     "planPath": ".planning/phases/06-integration-polish/06-03-PLAN.md",
     "project": "meeting-copilot",
     "phase": 6,
     "plan": 3,
     "priority": 5,
     "status": "pending",
-    "dependencies": ["06-02-build"],
+    "dependencies": [
+      "06-02-build"
+    ],
     "source": "gsd",
     "linearId": null,
     "linearIdentifier": null,
