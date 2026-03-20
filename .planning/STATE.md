@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 6 of 6 (Integration & Polish)
-Plan: 06-01 complete
+Plan: 06-02 complete
 Status: In progress
-Last activity: 2026-03-20 — Completed 06-01 (Bridge Meeting-Watcher v2)
+Last activity: 2026-03-20 — Completed 06-02 (Vercel + VPS Deployment)
 
-Progress: ██████████████████░ ~93%
+Progress: ██████████████████░ ~96%
 
 ## Performance Metrics
 
@@ -87,6 +87,8 @@ Recent decisions affecting current work:
 - D-0502-3: Only populate prior_context when total_prior_meetings > 0 (None otherwise)
 - D-0601-1: Late-import manager in WatcherBridge to avoid circular imports
 - D-0601-2: set_meeting_context() on ConnectionManager for clean public state updates
+- D-0602-1: Deploy script includes pre-flight validation (env, DNS, TLS) before service deployment
+- D-0602-2: CSP frame-ancestors includes https://*.zoom.us for iframe embedding
 
 ### Pending Todos
 
@@ -100,6 +102,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:51 UTC
-Stopped at: Completed 06-01-PLAN.md — Bridge Meeting-Watcher v2
+Last session: 2026-03-20 21:57 UTC
+Stopped at: Completed 06-02-PLAN.md — Vercel + VPS Deployment
 Resume file: None
