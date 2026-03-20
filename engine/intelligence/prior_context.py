@@ -8,11 +8,14 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from context.models import AttendeeContext
 from context.fireflies import TranscriptSummary
+
+if TYPE_CHECKING:
+    from context.models import AttendeeContext
 
 logger = logging.getLogger(__name__)
 

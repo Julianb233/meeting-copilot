@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from typing import Any
 
@@ -9,7 +10,12 @@ from fastapi import APIRouter
 from pydantic import BaseModel as PydanticBaseModel
 
 from context.assembler import assemble_meeting_context
+from intelligence.followup_email import draft_followup_email, send_followup_email
+from intelligence.summary_generator import generate_meeting_summary
+from intent.models import Intent
 from ws_handler import manager
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api")
 
@@ -96,4 +102,64 @@ async def process_transcript(body: ProcessRequest) -> dict[str, Any]:
         "classifications": [c.model_dump() for c in batch.classifications],
         "model_used": batch.model_used,
         "processing_time_ms": batch.processing_time_ms,
+    }
+
+
+# --- Post-meeting endpoints ---
+
+
+class MeetingEndRequest(PydanticBaseModel):
+    """Request body for POST /api/meeting/end."""
+
+    meeting_title: str
+    attendee_emails: list[str]
+    send_followup: bool = True
+    display_names: dict[str, str] | None = None
+
+
+@router.post("/meeting/end")
+async def meeting_end(body: MeetingEndRequest) -> dict[str, Any]:
+    """Trigger post-meeting processing: summary generation and optional follow-up email.
+
+    Assembles meeting context, extracts action items/decisions from tracked
+    intents, generates a project-aware summary, and optionally sends a
+    follow-up email to attendees via gws CLI.
+    """
+    # Assemble full meeting context
+    context = await assemble_meeting_context(
+        emails=body.attendee_emails,
+        meeting_title=body.meeting_title,
+        display_names=body.display_names,
+    )
+
+    # Convert tracked intent dicts back to Intent models
+    intents: list[Intent] = []
+    for raw in manager.state.intents:
+        try:
+            intents.append(Intent.model_validate(raw))
+        except Exception as exc:
+            logger.warning("Skipping malformed intent: %s", exc)
+
+    active_project = manager.state.active_project
+
+    # Generate project-aware summary
+    summary = generate_meeting_summary(context, intents, active_project)
+
+    # Optionally draft and send follow-up email
+    followup_result: dict[str, Any] | None = None
+    if body.send_followup:
+        email = draft_followup_email(
+            meeting_title=summary.meeting_title,
+            meeting_type=summary.meeting_type,
+            attendee_emails=body.attendee_emails,
+            action_items=summary.action_items,
+            decisions=summary.decisions,
+            next_steps=summary.next_steps,
+            attendee_names=body.display_names,
+        )
+        followup_result = await send_followup_email(email)
+
+    return {
+        "summary": summary.model_dump(),
+        "followup": followup_result,
     }
