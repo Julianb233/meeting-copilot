@@ -12,7 +12,7 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, Field
 
-from .. import config
+from .. import config  # noqa: INP001
 
 logger = logging.getLogger(__name__)
 
