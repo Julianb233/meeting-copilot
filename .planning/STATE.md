@@ -19,16 +19,16 @@ Progress: ██████████░ ~60%
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
-- Average duration: ~2.5 min
-- Total execution time: ~24.5 min
+- Total plans completed: 11
+- Average duration: ~2.4 min
+- Total execution time: ~26.5 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
-| 2 | 5/6 | ~11.1 min | ~2.2 min |
+| 2 | 6/6 | ~13.1 min | ~2.2 min |
 | 4 | 1/4 | ~1 min | ~1 min |
 
 **Recent Trend:**
@@ -63,6 +63,8 @@ Recent decisions affecting current work:
 - D-0205-2: Models in context/models.py as single source of truth for context types
 - D-0401-1: CSP connect-src uses copilot-api.agency.dev (must mirror Zoom Marketplace Domain Allow List)
 - D-0401-2: Running context check before getMeetingContext to avoid errors outside meetings
+- D-0206-1: Shell out to git log via asyncio subprocess (avoids gitpython dependency)
+- D-0206-2: Parse Repo(s) from client-profiles markdown using regex (table and bold formats)
 
 ### Pending Todos
 
@@ -76,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:34 UTC
-Stopped at: Completed 04-01-PLAN.md — OWASP headers + useZoomContext hook
+Last session: 2026-03-20 21:36 UTC
+Stopped at: Completed 02-06-PLAN.md — Git activity loader (Phase 2 complete)
 Resume file: None
