@@ -14,7 +14,7 @@ export default defineConfig({
       'X-Content-Type-Options': 'nosniff',
       'Referrer-Policy': 'same-origin',
       'Content-Security-Policy':
-        "default-src 'self'; script-src 'self' 'unsafe-inline' https://appssdk.zoom.us; style-src 'self' 'unsafe-inline'; connect-src 'self' wss://copilot-api.agency.dev https://api.zoom.us; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'self'",
+        "default-src 'self'; script-src 'self' 'unsafe-inline' https://appssdk.zoom.us; style-src 'self' 'unsafe-inline'; connect-src 'self' ws://localhost:8900 wss://copilot-api.agency.dev https://copilot-api.agency.dev https://api.zoom.us; img-src 'self' data:; font-src 'self' data:; frame-ancestors 'self' https://*.zoom.us https://zoom.us",
     },
   },
   build: {
