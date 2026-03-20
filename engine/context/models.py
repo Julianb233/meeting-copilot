@@ -40,6 +40,8 @@ class UnifiedMeetingContext(BaseModel):
     """Full assembled context for a meeting, ready for LLM consumption."""
 
     meeting_title: str | None = None
+    meeting_type: str = "unknown"
+    client_domains: list[str] = Field(default_factory=list)
     assembled_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     load_time_seconds: float = 0.0
     attendees: list[AttendeeContext] = Field(default_factory=list)
@@ -50,6 +52,8 @@ class UnifiedMeetingContext(BaseModel):
         lines: list[str] = []
         if self.meeting_title:
             lines.append(f"Meeting: {self.meeting_title}")
+        domain_info = ", ".join(self.client_domains) if self.client_domains else "N/A"
+        lines.append(f"Meeting type: {self.meeting_type} ({domain_info})")
         lines.append(f"Attendees: {len(self.attendees)}")
         lines.append("")
 

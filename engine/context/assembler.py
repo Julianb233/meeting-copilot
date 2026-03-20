@@ -30,6 +30,7 @@ from context.contacts import resolve_attendees
 from context.fireflies import fetch_meeting_history
 from context.linear_client import fetch_linear_projects
 from context.profiles import load_client_profile
+from intelligence.meeting_classifier import classify_meeting_type, get_client_domains
 
 logger = logging.getLogger(__name__)
 
@@ -150,8 +151,14 @@ async def assemble_meeting_context(
         len(errors),
     )
 
+    # Classify meeting type from attendee emails
+    meeting_type = classify_meeting_type(emails)
+    client_domains = get_client_domains(emails)
+
     return UnifiedMeetingContext(
         meeting_title=meeting_title,
+        meeting_type=meeting_type.value,
+        client_domains=sorted(client_domains),
         load_time_seconds=round(load_time, 2),
         attendees=attendee_contexts,
         errors=errors,
