@@ -10,27 +10,28 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 2 of 6 (Context Engine)
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-20 — Completed 01-04 (root config + deploy artifacts)
+Plan: 4 in progress
+Status: In progress
+Last activity: 2026-03-20 — Completed 02-04 (client profile loader)
 
-Progress: ██████░░░░ ~25%
+Progress: ███████░░░ ~30%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: ~3.1 min
-- Total execution time: ~12.4 min
+- Total plans completed: 5
+- Average duration: ~2.9 min
+- Total execution time: ~14.4 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
+| 2 | 1/? | ~2 min | ~2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (panel scaffold), 01-02 (engine scaffold), 01-03 (integration + deploy), 01-04 (root config + deploy)
+- Last 5 plans: 01-02 (engine scaffold), 01-03 (integration + deploy), 01-04 (root config + deploy), 02-04 (client profile loader)
 - Trend: Fast execution, clean results
 
 ## Accumulated Context
@@ -48,6 +49,9 @@ Recent decisions affecting current work:
 - D-0103-2: Zustand store actions mirror engine message types 1:1
 - D-0104-1: Nginx map block for WebSocket upgrade instead of hardcoded Connection header
 - D-0104-2: Separate /health and /state nginx locations proxying to REST port 8901
+- D-0204-1: Use pyyaml for YAML frontmatter parsing (reliable, worth the dependency)
+- D-0204-2: Search client-profiles/ before Obsidian contacts (richer data first)
+- D-0204-3: Trim raw_content to 2000 chars for LLM context injection
 
 ### Pending Todos
 
@@ -61,6 +65,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:20 UTC
-Stopped at: Completed 01-04-PLAN.md — Phase 1 fully complete (4/4 plans)
+Last session: 2026-03-20 21:22 UTC
+Stopped at: Completed 02-04-PLAN.md — Client profile loader
 Resume file: None
