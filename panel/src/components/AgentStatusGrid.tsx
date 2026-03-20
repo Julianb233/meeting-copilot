@@ -6,7 +6,7 @@ export function AgentStatusGrid({ agents }: { agents: AgentStatus[] }) {
       {agents.map((agent) => (
         <div key={agent.name} className="flex items-center gap-2">
           <span
-            className={`inline-block w-2 h-2 rounded-full ${
+            className={`inline-block w-1.5 h-1.5 rounded-full ${
               agent.status === 'idle'
                 ? 'bg-zinc-600'
                 : agent.status === 'busy'
@@ -16,7 +16,7 @@ export function AgentStatusGrid({ agents }: { agents: AgentStatus[] }) {
           />
           <div className="min-w-0">
             <span className="text-sm text-zinc-300">{agent.name}</span>
-            <span className="text-xs text-zinc-500 ml-1 truncate">
+            <span className="text-xs text-zinc-500 ml-1">
               {agent.current_task ?? agent.status}
             </span>
           </div>

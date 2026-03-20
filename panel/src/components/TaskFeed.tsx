@@ -1,5 +1,5 @@
-import type { MeetingTask } from '../types/messages.ts'
 import { TaskItem } from './TaskItem.tsx'
+import type { MeetingTask } from '../types/messages.ts'
 
 export function TaskFeed({ tasks }: { tasks: MeetingTask[] }) {
   const activeTasks = tasks.filter((t) => t.status !== 'completed')

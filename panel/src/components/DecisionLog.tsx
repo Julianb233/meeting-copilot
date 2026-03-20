@@ -11,10 +11,10 @@ export function DecisionLog({ decisions }: { decisions: Decision[] }) {
 
   return (
     <div className="space-y-2">
-      {decisions.map((decision) => (
-        <div key={decision.id}>
-          <span className="text-xs text-zinc-600">{decision.timestamp}</span>
-          <p className="text-sm text-zinc-300">{decision.text}</p>
+      {decisions.map((d) => (
+        <div key={d.id}>
+          <span className="text-xs text-zinc-600">{d.timestamp}</span>
+          <p className="text-sm text-zinc-300">{d.text}</p>
         </div>
       ))}
     </div>
