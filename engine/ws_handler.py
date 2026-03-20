@@ -52,6 +52,28 @@ class ConnectionManager:
         )
         self.router = LinearRouter()
 
+    def set_meeting_context(self, context) -> None:
+        """Update manager state with assembled meeting context.
+
+        Called by WatcherBridge after context assembly to give the manager
+        access to attendee and meeting information without reaching into
+        internals.
+        """
+        self.meeting_context = context
+        # Extract attendee names for intent detection
+        attendee_names: list[str] = []
+        for att in getattr(context, "attendees", []):
+            name = getattr(att, "name", None) or getattr(att, "display_name", None)
+            if name:
+                attendee_names.append(name)
+        self.state.context.attendees = attendee_names
+        self.state.context.title = getattr(context, "meeting_title", None)
+        logger.info(
+            "Meeting context set: %d attendees, title=%s",
+            len(attendee_names),
+            self.state.context.title,
+        )
+
     async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self.active_connections.append(websocket)

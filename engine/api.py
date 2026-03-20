@@ -9,6 +9,7 @@ from typing import Any
 from fastapi import APIRouter
 from pydantic import BaseModel as PydanticBaseModel
 
+from bridge.watcher_bridge import WatcherBridge, WatcherEvent
 from context.assembler import assemble_meeting_context
 from intelligence.followup_email import draft_followup_email, send_followup_email
 from intelligence.summary_generator import generate_meeting_summary
@@ -18,6 +19,9 @@ from ws_handler import manager
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api")
+
+# Module-level bridge instance
+watcher_bridge = WatcherBridge()
 
 
 class ContextRequest(PydanticBaseModel):
@@ -103,6 +107,24 @@ async def process_transcript(body: ProcessRequest) -> dict[str, Any]:
         "model_used": batch.model_used,
         "processing_time_ms": batch.processing_time_ms,
     }
+
+
+# --- Watcher bridge endpoint ---
+
+
+@router.post("/watcher/event")
+async def watcher_event(body: WatcherEvent) -> dict[str, Any]:
+    """Receive an event from meeting-watcher v2.
+
+    Accepts meeting_start, transcript_chunk, and meeting_end events and
+    routes them through the full copilot pipeline via the WatcherBridge.
+    """
+    try:
+        result = await watcher_bridge.handle_event(body)
+        return result
+    except Exception as exc:
+        logger.exception("Watcher event handler error")
+        return {"status": "error", "message": str(exc)}
 
 
 # --- Post-meeting endpoints ---
