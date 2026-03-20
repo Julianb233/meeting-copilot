@@ -31,13 +31,13 @@
   {
     "id": "worker-Ubun-9924",
     "registeredAt": "2026-03-20T13:52:00Z",
-    "lastHeartbeat": "2026-03-20T21:11:01.481646+00:00",
+    "lastHeartbeat": "2026-03-20T21:34:15.051325+00:00",
     "status": "busy",
-    "currentTask": "01-03-build",
+    "currentTask": "03-plan",
     "checkpoint": null,
     "sessionId": "bussit-session-001",
     "stats": {
-      "tasksCompleted": 3,
+      "tasksCompleted": 12,
       "tasksFailed": 0,
       "totalExecutionTime": 0,
       "avgTaskTime": 0
@@ -60,23 +60,16 @@
   {
     "id": "worker-Ubun-9937",
     "registeredAt": "2026-03-20T21:10:00Z",
-    "lastHeartbeat": "2026-03-20T21:10:00Z",
-    "status": "busy",
-    "currentTask": "01-03-build",
-    "checkpoint": {
-      "taskId": "01-03-build",
-      "phase": "claimed",
-      "startedAt": "2026-03-20T21:10:00Z",
-      "lastUpdate": "2026-03-20T21:10:00Z",
-      "progress": 0,
-      "context": {}
-    },
+    "lastHeartbeat": "2026-03-20T21:55:00Z",
+    "status": "idle",
+    "currentTask": null,
+    "checkpoint": null,
     "sessionId": "agent4-bussit-9937",
     "stats": {
-      "tasksCompleted": 0,
+      "tasksCompleted": 4,
       "tasksFailed": 0,
-      "totalExecutionTime": 0,
-      "avgTaskTime": 0
+      "totalExecutionTime": 1230,
+      "avgTaskTime": 308
     },
     "capabilities": {
       "preferredTypes": [

@@ -1,1 +1,25 @@
-[]
+[
+  {
+    "id": "learn-001",
+    "title": "Engine uses flat imports, not relative",
+    "description": "engine/ directory is the sys.path root. Use \"import config\" not \"from .. import config\". Also: ruff isort rewrites flat imports to relative \u2014 add known-first-party in pyproject.toml",
+    "severity": "high",
+    "errorMessage": "relative import beyond top-level package",
+    "solution": "Use flat imports: import config, from context.foo import Bar",
+    "applicability": {
+      "taskTypes": [
+        "build",
+        "bugfix"
+      ],
+      "projects": [
+        "meeting-copilot"
+      ]
+    },
+    "discoveredBy": "worker-Ubun-9924",
+    "discoveredAt": "2026-03-20T21:25:41.729861+00:00",
+    "useCount": 2,
+    "verifiedBy": [
+      "worker-Ubun-9924"
+    ]
+  }
+]
