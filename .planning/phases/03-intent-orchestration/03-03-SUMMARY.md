@@ -27,7 +27,7 @@ decisions:
     summary: "Agent selection prefers idle specialists, falls back to any idle, then queues on first specialist"
 
 metrics:
-  duration: ~1 min
+  duration: ~3 min
   completed: 2026-03-20
 ---
 
