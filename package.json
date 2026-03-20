@@ -1,0 +1,21 @@
+{
+  "name": "meeting-copilot",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AI meeting copilot - Zoom companion panel + Python engine",
+  "scripts": {
+    "dev": "concurrently --names panel,engine --prefix-colors blue,green \"npm run dev:panel\" \"npm run dev:engine\"",
+    "dev:panel": "cd panel && npm run dev",
+    "dev:engine": "cd engine && .venv/bin/python main.py",
+    "build:panel": "cd panel && npm run build",
+    "test:panel": "cd panel && npx vitest run",
+    "test:engine": "cd engine && .venv/bin/python -m pytest -v",
+    "test": "npm run test:panel && npm run test:engine",
+    "lint:panel": "cd panel && npx biome check src/",
+    "lint:engine": "cd engine && .venv/bin/ruff check .",
+    "lint": "npm run lint:panel && npm run lint:engine"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
