@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-20)
 
 **Core value:** The meeting IS the work — copilot detects needs and executes work during the meeting, not after.
-**Current focus:** Phase 3 + Phase 4 (parallel execution)
+**Current focus:** Phase 5 (Meeting Intelligence)
 
 ## Current Position
 
-Phase: 3-4 of 6 (Intent Orchestration + Zoom Panel)
-Plan: Phase 3 COMPLETE (03-01 thru 03-04), 04-01 + 04-02 + 04-03 done
+Phase: 5 of 6 (Meeting Intelligence)
+Plan: 05-01 complete
 Status: In progress
-Last activity: 2026-03-20 — Completed 03-04 (Pipeline Integration)
+Last activity: 2026-03-20 — Completed 05-01 (Meeting Classifier)
 
-Progress: █████████████████░ ~85%
+Progress: █████████████████░ ~87%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: ~2.4 min
-- Total execution time: ~41.5 min
+- Total execution time: ~43.6 min
 
 **By Phase:**
 
@@ -31,6 +31,7 @@ Progress: █████████████████░ ~85%
 | 2 | 6/6 | ~13.1 min | ~2.2 min |
 | 3 | 4/4 | ~10 min | ~2.5 min |
 | 4 | 3/4 | ~6 min | ~2 min |
+| 5 | 1/? | ~2.1 min | ~2.1 min |
 
 **Recent Trend:**
 - Last 5 plans: 02-06 (git), 04-01 (OWASP + Zoom hook), 03-03 (orchestration), 03-01 (intent detector), 03-02 (routing)
@@ -77,6 +78,8 @@ Recent decisions affecting current work:
 - D-0403-2: 5-second loading timeout fallback until engine sends ack messages
 - D-0304-1: Broadcast intents to panel before routing for low-latency feedback
 - D-0304-2: Pass broadcast_fn callback to FleetSpawner for async task completion broadcasts
+- D-0501-1: Owner emails filtered from classification to avoid false positives
+- D-0501-2: meeting_type stored as str (not enum) on UnifiedMeetingContext for JSON serialization
 
 ### Pending Todos
 
@@ -90,6 +93,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:45 UTC
-Stopped at: Completed 03-04-PLAN.md — Pipeline Integration (Phase 3 complete)
+Last session: 2026-03-20 21:47 UTC
+Stopped at: Completed 05-01-PLAN.md — Meeting Classifier
 Resume file: None
