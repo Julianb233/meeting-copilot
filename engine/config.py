@@ -9,6 +9,7 @@ load_dotenv()
 # Server
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "8900"))
+REST_PORT = int(os.getenv("REST_PORT", "8901"))
 
 # API Keys
 FIREFLIES_API_KEY = os.getenv("FIREFLIES_API_KEY", "")
