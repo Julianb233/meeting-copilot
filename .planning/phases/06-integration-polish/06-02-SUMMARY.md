@@ -44,6 +44,8 @@ metrics:
   - TLS cert check + automatic certbot if DNS is ready
   - Step 5: Local and public health checks
 - Nginx config verified correct: /ws -> 8900, /api -> 8901, /health and /state direct proxies
+- Created engine/.env with production API keys from environment (gitignored)
+- Updated .env.example with REST_PORT and LINEAR_DEFAULT_TEAM_ID
 
 ### Task 2: Deploy panel to Vercel
 - Added `https://copilot-api.agency.dev` to CSP connect-src for REST API calls
@@ -83,7 +85,8 @@ Before the stack is fully connected:
 | Task | Commit | Description |
 |------|--------|-------------|
 | 1 | 36cdc12 | Enhance engine deployment configs |
-| 2 | d9f462f | Update deployment configs for panel + engine |
+| 1 | d9f462f | Update deployment configs for panel + engine |
+| 1 | 73783ca | Validate and prepare engine deployment configs |
 | 2 | (deploy) | Panel deployed to https://panel-ruddy-eight.vercel.app |
 
 ## Next Phase Readiness
