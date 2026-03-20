@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-20)
 ## Current Position
 
 Phase: 3-4 of 6 (Intent Orchestration + Zoom Panel)
-Plan: 03-01 + 03-03 complete, 04-01 done
+Plan: 03-01 + 03-02 + 03-03 complete, 04-01 done
 Status: In progress
-Last activity: 2026-03-20 — Completed 03-01 (Intent detector with multi-model fallback)
+Last activity: 2026-03-20 — Completed 03-02 (Project-aware routing)
 
-Progress: ████████████░ ~65%
+Progress: █████████████░ ~70%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: ~2.4 min
-- Total execution time: ~30.9 min
+- Total execution time: ~32.9 min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: ████████████░ ~65%
 |-------|-------|-------|----------|
 | 1 | 4/4 | ~12.4 min | ~3.1 min |
 | 2 | 6/6 | ~13.1 min | ~2.2 min |
-| 3 | 2/4 | ~4.4 min | ~2.2 min |
+| 3 | 3/4 | ~6.4 min | ~2.1 min |
 | 4 | 1/4 | ~1 min | ~1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-05 (assembler), 02-06 (git), 04-01 (OWASP + Zoom hook), 03-03 (orchestration), 03-01 (intent detector)
+- Last 5 plans: 02-06 (git), 04-01 (OWASP + Zoom hook), 03-03 (orchestration), 03-01 (intent detector), 03-02 (routing)
 - Trend: Fast execution, sub-minute plans for focused implementation tasks
 
 ## Accumulated Context
@@ -70,6 +70,9 @@ Recent decisions affecting current work:
 - D-0303-2: Agent selection prefers idle specialists, falls back to any idle, then queues
 - D-0301-1: Gemini first in fallback chain (Anthropic has zero credits)
 - D-0301-2: details field defaults to empty string for LLM null tolerance
+- D-0302-1: 4-level resolution priority: explicit > topic > attendee > default
+- D-0302-2: Topic switching requires 3+ consecutive mentions (avoids false positives)
+- D-0302-3: Default team ID from existing meeting-watcher hardcoded value
 
 ### Pending Todos
 
@@ -83,6 +86,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-20 21:39 UTC
-Stopped at: Completed 03-01-PLAN.md — Intent detector with multi-model fallback chain
+Last session: 2026-03-20 21:40 UTC
+Stopped at: Completed 03-02-PLAN.md — Project-aware routing
 Resume file: None
