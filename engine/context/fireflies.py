@@ -12,7 +12,10 @@ from typing import Any
 import httpx
 from pydantic import BaseModel, Field
 
-import config
+try:
+    from .. import config
+except ImportError:
+    import config  # type: ignore[no-redef]
 
 logger = logging.getLogger(__name__)
 
