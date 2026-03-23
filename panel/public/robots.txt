@@ -1,0 +1,5 @@
+# robots.txt — Meeting Copilot
+User-agent: *
+Allow: /
+
+Sitemap: https://meeting-copilot-two.vercel.app/sitemap.xml

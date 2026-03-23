@@ -6,7 +6,7 @@ Build a Zoom companion panel that executes work during meetings. Six phases: sca
 
 ## Phases
 
-- [ ] **Phase 1: Scaffold & Infrastructure** - Vite+React panel, FastAPI engine (WS+REST on port 8900), nginx TLS
+- [ ] **Phase 1: Scaffold & Infrastructure** - Vite+React panel, FastAPI engine (WS 8900 + REST 8901), nginx TLS
 - [ ] **Phase 2: Context Engine** - Load full attendee context from all data sources at meeting start
 - [ ] **Phase 3: Intent Detection & Task Orchestration** - Understand intents, route to projects, spawn agents
 - [ ] **Phase 4: Zoom Companion Panel UI** - React sidebar with live tasks, status, quick actions
@@ -20,16 +20,16 @@ Build a Zoom companion panel that executes work during meetings. Six phases: sca
 **Depends on**: Nothing (first phase)
 **Requirements**: COM-01, COM-02, COM-03
 **Success Criteria** (what must be TRUE):
-  1. Vite+React 19 app builds and runs locally (Zoom iframe — no SSR needed)
-  2. FastAPI engine starts with WebSocket at /ws and REST API at /api/* on port 8900
-  3. GET /api/health returns 200 with JSON payload
+  1. Vite+React 19 app builds and runs locally (Zoom iframe -- no SSR needed)
+  2. FastAPI engine starts with WebSocket on port 8900 and REST API on port 8901
+  3. GET /health on port 8901 returns 200 with JSON payload
   4. WebSocket messages flow bidirectionally between panel and engine
-  5. Nginx config proxies WebSocket with TLS
+  5. Nginx config proxies /ws to 8900 and /api to 8901 with TLS
 **Plans**: 3 plans
 
 Plans:
 - [ ] 01-01: Scaffold Vite + React 19 panel with Zoom Apps SDK and Tailwind
-- [ ] 01-02: Scaffold FastAPI engine with WebSocket (/ws) and REST API (/api/*) on port 8900
+- [ ] 01-02: Scaffold FastAPI engine — dual-port: WebSocket (/ws) on 8900, REST API on 8901
 - [ ] 01-03: Wire panel to engine (shared types, WebSocket hook, Zustand store), nginx reverse proxy, systemd service, deployment scripts
 
 ### Phase 2: Context Engine
@@ -42,7 +42,8 @@ Plans:
   3. Linear projects and open issues load for attendee's organization
   4. Obsidian client profile loads if one exists
   5. Unified context object assembles all sources for the classifier prompt
-**Plans**: 5 plans
+  6. Recent git activity loads for matched projects
+**Plans**: 6 plans
 
 Plans:
 - [ ] 02-01: Attendee identity resolution — Google Contacts API lookup by email
@@ -50,6 +51,7 @@ Plans:
 - [ ] 02-03: Linear project mapper — map attendee to projects and open issues
 - [ ] 02-04: Client profile loader — read from Obsidian vault
 - [ ] 02-05: Context assembler — merge all sources into unified context object
+- [ ] 02-06: Git activity loader — recent commits for matched client projects
 
 ### Phase 3: Intent Detection & Task Orchestration
 **Goal**: Upgrade classification to intent understanding, route to projects, spawn fleet agents
@@ -123,7 +125,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Scaffold & Infrastructure | 0/3 | Not started | - |
-| 2. Context Engine | 0/5 | Not started | - |
+| 2. Context Engine | 0/6 | Not started | - |
 | 3. Intent & Orchestration | 0/4 | Not started | - |
 | 4. Zoom Panel UI | 0/4 | Not started | - |
 | 5. Meeting Intelligence | 0/3 | Not started | - |

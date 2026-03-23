@@ -49,6 +49,7 @@ class MeetingContext(BaseModel):
     title: str | None = None
     attendees: list[str] = Field(default_factory=list)
     started_at: datetime | None = None
+    rich_context: dict[str, Any] | None = None  # Populated by context assembler
 
 
 class MeetingState(BaseModel):
@@ -57,6 +58,9 @@ class MeetingState(BaseModel):
     tasks: list[MeetingTask] = Field(default_factory=list)
     intents: list[dict[str, Any]] = Field(default_factory=list)
     transcript_chunks: list[dict[str, Any]] = Field(default_factory=list)
+    active_project: str | None = None  # Currently detected project name
+    intent_count: int = 0  # Total intents detected this session
+    task_count: int = 0  # Total tasks spawned this session
     agents: list[AgentStatus] = Field(default_factory=lambda: [
         AgentStatus(name="agent1"),
         AgentStatus(name="agent2"),
@@ -75,6 +79,20 @@ class PanelQuickAction(BaseModel):
     type: str = "quick_action"
     action: QuickAction
     payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class PanelTranscriptChunk(BaseModel):
+    """Panel sends transcript sentences for intent processing."""
+    type: str = "transcript_chunk"
+    sentences: list[dict[str, Any]]  # Each has "text", "speaker", "speaker_name"
+    meeting_title: str | None = None
+
+
+class PanelTaskAction(BaseModel):
+    """Panel requests action on a tracked task (cancel, retry)."""
+    type: str = "task_action"
+    task_id: str
+    action: str  # "cancel" or "retry"
 
 
 # --- WebSocket Messages: Engine -> Panel ---
@@ -108,6 +126,21 @@ class EngineTaskFailed(BaseModel):
     type: str = "task_failed"
     task_id: str
     error: str
+
+
+class EngineIntentsDetected(BaseModel):
+    """Broadcast when new intents are extracted from transcript."""
+    type: str = "intents_detected"
+    intents: list[dict[str, Any]]  # Intent.model_dump() for each
+    model_used: str
+    processing_time_ms: float
+
+
+class EngineTaskUpdate(BaseModel):
+    """Broadcast when a task changes state."""
+    type: str = "task_update"
+    task: dict[str, Any]  # TrackedTask.model_dump()
+    event: str  # "dispatched", "started", "completed", "failed"
 
 
 class EngineAgentStatus(BaseModel):
