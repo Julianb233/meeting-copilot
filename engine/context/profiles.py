@@ -32,6 +32,22 @@ _SKIP_DIRS = {"templates", "clients"}
 # Max raw content length to keep context manageable for LLM
 _MAX_RAW_CONTENT = 2000
 
+# Markdown section headings to strip from raw_content before LLM injection.
+# These sections contain legal or financial info that should not be surfaced
+# as meeting context facts (billing amounts, contract terms, legal constraints).
+_STRIP_SECTIONS = {
+    "engagement summary",
+    "payment",
+    "contract",
+    "billing",
+    "legal",
+    "compliance",
+    "red flags",
+    "risks",
+    "notes & context",
+    "things to remember",
+}
+
 
 # --- Model ---
 
@@ -52,6 +68,40 @@ class ClientProfile(BaseModel):
 
 
 # --- Internal helpers ---
+
+
+def _strip_sensitive_sections(body: str) -> str:
+    """Remove legal info and payment/financial sections from profile body.
+
+    Strips any markdown section (## heading) whose title matches a known
+    sensitive category (payment, legal, contract, engagement summary, etc.)
+    so that billing amounts, contract terms, and legal constraints are never
+    surfaced as meeting context facts.
+
+    Only top-level (##) sections are considered.  Nested (###) headings are
+    removed along with their parent section.
+    """
+    lines = body.split("\n")
+    result: list[str] = []
+    in_stripped_section = False
+
+    for line in lines:
+        # Detect a ## heading
+        if line.startswith("## "):
+            heading = line[3:].strip().lower()
+            # Check whether this heading matches any sensitive category
+            in_stripped_section = any(
+                keyword in heading for keyword in _STRIP_SECTIONS
+            )
+        elif line.startswith("# "):
+            # Top-level heading resets section state
+            in_stripped_section = False
+
+        if not in_stripped_section:
+            result.append(line)
+
+    return "\n".join(result).strip()
+
 
 def _parse_frontmatter(text: str) -> tuple[dict, str]:
     """Parse YAML frontmatter from markdown text.
@@ -136,6 +186,7 @@ def _profile_from_client_profiles(
             if len(parts) >= 3:
                 formality = parts[2].strip()
 
+    sanitized = _strip_sensitive_sections(body)
     return ClientProfile(
         slug=slug,
         name=name,
@@ -146,7 +197,7 @@ def _profile_from_client_profiles(
         communication_style=comm_style,
         formality=formality,
         status=frontmatter.get("status"),
-        raw_content=body[:_MAX_RAW_CONTENT],
+        raw_content=sanitized[:_MAX_RAW_CONTENT],
         source="client_profiles",
     )
 
@@ -155,6 +206,7 @@ def _profile_from_obsidian(
     filepath: Path, frontmatter: dict, body: str
 ) -> ClientProfile:
     """Build ClientProfile from an Obsidian vault contact file."""
+    sanitized = _strip_sensitive_sections(body)
     return ClientProfile(
         slug=filepath.stem.lower().replace(" ", "-"),
         name=frontmatter.get("name", filepath.stem),
@@ -165,7 +217,7 @@ def _profile_from_obsidian(
         communication_style=frontmatter.get("communication_style"),
         formality=frontmatter.get("formality"),
         status="active" if frontmatter.get("is_client") else None,
-        raw_content=body[:_MAX_RAW_CONTENT],
+        raw_content=sanitized[:_MAX_RAW_CONTENT],
         source="obsidian_contacts",
     )
 
